@@ -1,0 +1,65 @@
+name: release helpers
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            artifact: macos
+          - os: windows-latest
+            artifact: windows
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r host/requirements.txt pyinstaller
+      - run: pyinstaller --clean --noconfirm host/cdmx_imager.spec
+      - name: Package macOS helper
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          mkdir package
+          cp dist/CDMX-Radxa-Flasher package/
+          cp host/start-packaged-macos.command package/Start-CDMX-Radxa-Flasher.command
+          chmod +x package/*
+          ditto -c -k --sequesterRsrc --keepParent package cdmx-radxa-flash-macos.zip
+      - name: Package Windows helper
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Copy-Item dist/CDMX-Radxa-Flasher.exe CDMX-Radxa-Flasher.exe
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            cdmx-radxa-flash-macos.zip
+            CDMX-Radxa-Flasher.exe
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "$GITHUB_REF_NAME" artifacts/*
+          --repo "$GITHUB_REPOSITORY"
+          --title "CDMX Radxa Flasher $GITHUB_REF_NAME"
+          --generate-notes
