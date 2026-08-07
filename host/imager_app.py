@@ -33,6 +33,7 @@ UI_PATH = BUNDLE_ROOT / "host" / "imager_ui.html"
 LOCAL_MANIFEST = BUNDLE_ROOT / "site" / "manifest.json"
 DEFAULT_MANIFEST_URL = "https://cdmx-radxaflash.mantilla.ca/manifest.json"
 TRUSTED_WEB_ORIGIN = "https://cdmx-radxaflash.mantilla.ca"
+PUBLIC_SITE_URL = TRUSTED_WEB_ORIGIN + "/"
 LOCAL_GOLDEN_IMAGE = SOURCE_ROOT / "image" / "cdmx-workshop-golden.img.xz"
 MAC_DISK_PATTERN = re.compile(r"^/dev/disk[0-9]+$")
 LINUX_DISK_PATTERN = re.compile(r"^/dev/(?:sd[a-z]+|mmcblk[0-9]+)$")
@@ -829,11 +830,12 @@ def main() -> int:
         return 69
     token = secrets.token_urlsafe(32)
     server = ImagerServer(("127.0.0.1", args.port), token)
-    url = f"http://127.0.0.1:{args.port}/"
-    print(f"CDMX Radxa Flasher: {url}", flush=True)
+    local_url = f"http://127.0.0.1:{args.port}/"
+    print(f"CDMX Radxa Flasher API: {local_url}", flush=True)
+    print(f"Web interface: {PUBLIC_SITE_URL}", flush=True)
     print("Keep this window open while flashing cards.", flush=True)
     if not args.no_browser:
-        threading.Timer(0.8, lambda: webbrowser.open(url)).start()
+        threading.Timer(0.8, lambda: webbrowser.open(PUBLIC_SITE_URL)).start()
     try:
         server.serve_forever()
     except KeyboardInterrupt:

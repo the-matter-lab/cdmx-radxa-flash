@@ -17,7 +17,7 @@ fi
 (
   for _ in {1..60}; do
     if curl --fail --silent "http://127.0.0.1:${PORT}/api/state" >/dev/null 2>&1; then
-      open "http://127.0.0.1:${PORT}/"
+      open "https://cdmx-radxaflash.mantilla.ca/"
       exit 0
     fi
     sleep 0.5

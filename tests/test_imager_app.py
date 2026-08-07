@@ -98,6 +98,8 @@ class ImagerTests(unittest.TestCase):
         self.assertIn("/api/session", public_html)
         self.assertIn("/api/flash", public_html)
         self.assertIn("IDENTITIES", public_html)
+        self.assertIn("Volver a intentar", public_html)
+        self.assertIn(imager.PUBLIC_SITE_URL, (MODULE_PATH.parents[1] / "host" / "start-imager.command").read_text())
 
     def test_job_reservation_is_atomic(self):
         state = imager.JobState()
