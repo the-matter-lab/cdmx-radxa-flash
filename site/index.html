@@ -5,74 +5,82 @@
 <meta name="color-scheme" content="dark">
 <title>CDMX Radxa Flasher · Matter Lab</title>
 <style>
-:root{--bg:#050806;--panel:#0d1210;--line:#233129;--text:#f5f7f5;--muted:#9ca9a0;--green:#12f98b;--green2:#00cc74;--warn:#ffd166}
-*{box-sizing:border-box}html{background:var(--bg)}body{margin:0;color:var(--text);background:radial-gradient(circle at 77% -10%,#123527 0,transparent 36rem),var(--bg);font:15px/1.55 Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-main{width:min(940px,calc(100% - 32px));margin:0 auto;padding:40px 0 64px}.nav{display:flex;justify-content:space-between;align-items:center;gap:24px}.nav img{width:180px;height:auto}.navlinks{display:flex;align-items:center;gap:16px}.navlinks a{color:var(--text);text-decoration:none;font-size:13px;font-weight:700}.navlinks a:hover{color:var(--green)}.pill{border:1px solid var(--line);border-radius:999px;padding:7px 11px;color:var(--muted);font:12px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace}
-.hero{padding:88px 0 56px;max-width:760px}.eyebrow{color:var(--green);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:12px}.hero h1{font-size:clamp(42px,7vw,74px);line-height:.98;letter-spacing:-.065em;margin:16px 0 22px}.hero p{color:#bdc8c0;font-size:18px;max-width:650px;margin:0}.buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}.button{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 17px;border-radius:10px;text-decoration:none;font-weight:750;background:var(--green);color:#001b0f}.button:hover{background:#40ffa4}.button.secondary{background:transparent;color:var(--text);border:1px solid var(--line)}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);border-radius:18px;padding:22px;min-height:210px}.num{display:grid;place-items:center;width:32px;height:32px;border:1px solid #2d4939;border-radius:9px;color:var(--green);font-weight:800}.card h2{font-size:18px;margin:22px 0 8px}.card p{color:var(--muted);margin:0}.warning{margin-top:14px;border-color:#51451f}.warning strong{color:var(--warn)}
-.details{display:grid;grid-template-columns:1.4fr .6fr;gap:14px;margin-top:14px}.meta{display:grid;grid-template-columns:auto 1fr;gap:9px 18px;margin:18px 0 0}.meta dt{color:var(--muted)}.meta dd{margin:0;min-width:0;overflow-wrap:anywhere;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}.links{display:flex;flex-direction:column;gap:8px;margin-top:18px}.links a{color:var(--green);text-decoration:none}.fine{color:#728078;font-size:12px;margin-top:40px;border-top:1px solid var(--line);padding-top:18px}
-@media(max-width:760px){main{padding-top:24px}.hero{padding:64px 0 40px}.grid,.details{grid-template-columns:1fr}.card{min-height:auto}.nav img{width:145px}.navlinks{gap:10px}.navlinks a{font-size:12px}.pill{display:none}.button{flex:1 1 190px}}
+:root{--bg:#050806;--panel:#0b100d;--line:#243129;--text:#f5f7f5;--muted:#91a097;--green:#65ef96;--danger:#ff8177}
+*{box-sizing:border-box}html{background:var(--bg)}body{margin:0;background:radial-gradient(circle at 70% -20%,#123025 0,transparent 34rem),var(--bg);color:var(--text);font:15px/1.45 Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{width:min(680px,calc(100% - 28px));margin:0 auto;padding:30px 0 48px}.top{display:flex;align-items:center;justify-content:space-between;gap:20px}.top img{width:150px;height:auto}.version{color:var(--muted);font:12px ui-monospace,SFMono-Regular,Menlo,monospace}
+.intro{margin:64px 0 28px}.intro h1{margin:0 0 8px;font-size:clamp(34px,7vw,52px);line-height:1;letter-spacing:-.055em}.intro p{margin:0;color:var(--muted);font-size:17px}
+.panel{border:1px solid var(--line);border-radius:18px;background:rgba(11,16,13,.9);padding:20px;margin-top:12px}.row{display:flex;align-items:center;justify-content:space-between;gap:16px}.label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.09em}.status{font-weight:700;text-align:right}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#58635c;margin-right:7px}.online .dot{background:var(--green);box-shadow:0 0 14px var(--green)}
+select{width:100%;margin-top:13px;padding:12px;border:1px solid var(--line);border-radius:11px;background:#0e1511;color:var(--text);font:inherit}.teams{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-top:14px}.team{border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--text);padding:11px 3px;font:700 14px inherit;cursor:pointer}.team:hover{border-color:#668071}.team.selected{border-color:var(--green);background:var(--green);color:#062012}.team:last-child{grid-column:span 2}.action{width:100%;margin-top:14px;padding:13px;border:0;border-radius:11px;background:var(--green);color:#062012;font:800 15px inherit;cursor:pointer}.action:disabled{opacity:.3;cursor:not-allowed}
+.progress{height:8px;margin:15px 0 9px;border-radius:999px;overflow:hidden;background:#172019}.fill{height:100%;width:0;background:var(--green);transition:width .3s}.detail{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:13px}.phase{color:var(--text);font-weight:700}.error{color:var(--danger);margin:10px 0 0}.hint{color:var(--muted);font-size:13px;margin:10px 0 0}.offline{display:none}.offline.show{display:block}.offline .buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.smallButton{border:1px solid var(--line);border-radius:9px;padding:9px 12px;color:var(--text);text-decoration:none;font-weight:700}.smallButton.primary{background:var(--green);border-color:var(--green);color:#062012}
+footer{display:flex;justify-content:space-between;gap:16px;margin-top:24px;color:#6f7d74;font-size:12px}footer div{display:flex;gap:14px}footer a{color:#91a097;text-decoration:none}footer a:hover{color:var(--green)}
+@media(max-width:560px){main{padding-top:22px}.intro{margin-top:46px}.teams{grid-template-columns:repeat(4,1fr)}.team:last-child{grid-column:span 2}.detail,footer{display:block}.detail span:last-child{display:block;margin-top:3px}footer div{margin-top:8px}}
 </style>
 <main>
-  <nav class="nav">
+  <header class="top">
     <img src="matter-lab-logo.svg" alt="Matter Lab">
-    <div class="navlinks">
-      <a href="https://github.com/the-matter-lab/cdmx-radxa-flash">Código GitHub</a>
-      <a id="navImage" href="downloads/cdmx-workshop-golden.img.xz">Imagen SD</a>
-      <span class="pill" id="version">imagen verificada</span>
+    <span class="version" id="version">imagen verificada</span>
+  </header>
+
+  <section class="intro">
+    <h1>Grabar una SD.</h1>
+    <p>Inserta la tarjeta, elige el equipo y presiona grabar.</p>
+  </section>
+
+  <section class="panel" id="devicePanel">
+    <div class="row">
+      <span class="label">Tarjeta SD</span>
+      <span class="status" id="diskStatus"><span class="dot"></span>Buscando lector local…</span>
     </div>
-  </nav>
-  <section class="hero">
-    <div class="eyebrow">Satellite School · CDMX 2026</div>
-    <h1>Prepara una Radxa<br>en tres pasos.</h1>
-    <p>La misma imagen verificada para <strong>equipo0–equipo9</strong> y <strong>admin</strong>. El ayudante corre solamente en tu laptop; esta página nunca tiene acceso a tus discos.</p>
+    <select id="disk" aria-label="Tarjeta SD" disabled><option>Conecta una tarjeta SD</option></select>
+    <p class="hint">Solo aparecen discos extraíbles completos. La tarjeta elegida se borrará.</p>
+  </section>
+
+  <section class="panel">
+    <div class="row"><span class="label">Identidad</span><span class="status" id="imageStatus">equipo0</span></div>
+    <div class="teams" id="teams"></div>
+    <button class="action" id="flash" disabled>Borrar y grabar equipo0</button>
+  </section>
+
+  <section class="panel" aria-live="polite">
+    <div class="detail"><span class="phase" id="phase">Listo</span><span id="progressDetail">0%</span></div>
+    <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress"><div class="fill" id="fill"></div></div>
+    <p class="error" id="error" hidden></p>
+    <p class="hint" id="lastLog">La imagen se descarga y verifica automáticamente.</p>
+  </section>
+
+  <section class="panel offline" id="offline">
+    <div class="row"><span class="label">Lector local</span><span class="status">No está abierto</span></div>
+    <p class="hint">El navegador no puede escribir discos por sí solo. Abre el lector una vez; después esta página detectará la SD y hará todo lo demás.</p>
     <div class="buttons">
-      <a class="button" id="mac" href="https://github.com/the-matter-lab/cdmx-radxa-flash/releases/latest">Descargar para macOS</a>
-      <a class="button" id="windows" href="https://github.com/the-matter-lab/cdmx-radxa-flash/releases/latest">Descargar para Windows</a>
-      <a class="button secondary" href="https://github.com/the-matter-lab/cdmx-radxa-flash">Ver código</a>
+      <a class="smallButton primary" href="http://127.0.0.1:8766/">Abrir lector local</a>
+      <a class="smallButton" id="mac" href="https://github.com/the-matter-lab/cdmx-radxa-flash/releases/latest">Instalar en macOS</a>
+      <a class="smallButton" id="windows" href="https://github.com/the-matter-lab/cdmx-radxa-flash/releases/latest">Instalar en Windows</a>
     </div>
   </section>
 
-  <section class="grid" aria-label="Instrucciones">
-    <article class="card"><div class="num">1</div><h2>Abre el ayudante</h2><p>En macOS, abre el archivo <code>.command</code> del ZIP. En Windows, ejecuta el <code>.exe</code> como administrador. Acepta una sola autorización.</p></article>
-    <article class="card"><div class="num">2</div><h2>Inserta y elige</h2><p>Conecta una tarjeta SD. Selecciona su unidad y la identidad correcta: <code>equipo0</code> a <code>equipo9</code>, o <code>admin</code>.</p></article>
-    <article class="card"><div class="num">3</div><h2>Graba y retira</h2><p>El ayudante descarga la versión vigente, verifica SHA‑512, escribe, lee de regreso y personaliza la tarjeta. Retírala solo cuando marque 100%.</p></article>
-  </section>
-  <section class="card warning"><strong>Atención:</strong> la unidad seleccionada se borra por completo. El ayudante muestra únicamente discos extraíbles USB/SD y vuelve a comprobar el destino antes de escribir.</section>
-
-  <section class="details">
-    <article class="card">
-      <div class="eyebrow">Versión central</div>
-      <dl class="meta">
-        <dt>Versión</dt><dd id="metaVersion">cargando…</dd>
-        <dt>Imagen</dt><dd id="metaImage">cdmx-workshop-golden.img.xz</dd>
-        <dt>SHA‑512</dt><dd id="metaSha">cargando…</dd>
-        <dt>Docker</dt><dd id="metaDocker">cargando…</dd>
-      </dl>
-    </article>
-    <article class="card">
-      <div class="eyebrow">Alternativas</div>
-      <div class="links">
-        <a id="raw" href="downloads/cdmx-workshop-golden.img.xz">Imagen comprimida</a>
-        <a href="downloads/cdmx-workshop-golden.img.xz.sha512">Archivo SHA‑512</a>
-        <a href="https://hub.docker.com/r/bestquark/cdmx-radxa-zero3w">Imagen en Docker Hub</a>
-      </div>
-      <p class="fine">Los binarios no están firmados comercialmente; macOS o Windows pueden pedir confirmación antes de abrirlos.</p>
-    </article>
-  </section>
-  <footer class="fine">Matter Lab International Conference 2026 ∙ Satellite School</footer>
+  <footer>
+    <span>Matter Lab · CDMX 2026</span>
+    <div><a href="https://github.com/the-matter-lab/cdmx-radxa-flash">GitHub</a><a id="imageLink" href="downloads/cdmx-workshop-golden.img.xz">Imagen SD</a></div>
+  </footer>
 </main>
 <script>
-fetch('manifest.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error(r.status);return r.json()}).then(m=>{
-  document.querySelector('#version').textContent=`imagen ${m.version}`;
-  document.querySelector('#metaVersion').textContent=m.version;
-  document.querySelector('#metaImage').textContent=`${m.image.filename} · ${(m.image.compressed_bytes/1e9).toFixed(2)} GB`;
-  document.querySelector('#metaSha').textContent=m.image.sha512;
-  document.querySelector('#metaDocker').textContent=m.docker;
-  document.querySelector('#mac').href=m.downloads.macos;
-  document.querySelector('#windows').href=m.downloads.windows;
-  document.querySelector('#raw').href=m.image.url;
-  document.querySelector('#navImage').href=m.image.url;
-}).catch(()=>{document.querySelector('#version').textContent='metadatos sin conexión'});
+const API='http://127.0.0.1:8766';
+const IDENTITIES=[0,1,2,3,4,5,6,7,8,9,'admin'];
+let token='',selected=0,lastState=null,failures=0;
+const $=id=>document.getElementById(id);
+const name=id=>id==='admin'?'admin':`equipo${id}`;
+const size=n=>n?`${(n/1e9).toFixed(2)} GB`:'—';
+
+function buildTeams(){for(const id of IDENTITIES){const button=document.createElement('button');button.type='button';button.className='team';button.dataset.identity=String(id);button.textContent=id==='admin'?'Admin':id;button.onclick=()=>{selected=id;renderIdentity()};$('teams').appendChild(button)}renderIdentity()}
+function renderIdentity(){for(const button of $('teams').children)button.classList.toggle('selected',button.dataset.identity===String(selected));$('imageStatus').textContent=name(selected);$('flash').textContent=`Borrar y grabar ${name(selected)}`}
+function connected(value){$('devicePanel').classList.toggle('online',value);$('offline').classList.toggle('show',!value&&failures>1)}
+function render(state){lastState=state;connected(true);failures=0;const disks=state.disks||[],select=$('disk'),before=select.value;select.replaceChildren();for(const disk of disks){const option=document.createElement('option');option.value=disk.id;option.textContent=`${disk.name} · ${size(disk.size)}`;select.appendChild(option)}if(disks.some(d=>d.id===before))select.value=before;if(!disks.length){const option=document.createElement('option');option.textContent='Inserta una tarjeta SD';select.appendChild(option)}select.disabled=!disks.length||state.running;
+$('diskStatus').innerHTML=`<span class="dot"></span>${disks.length?disks.length===1?'1 tarjeta detectada':`${disks.length} tarjetas detectadas`:'Sin tarjeta'}`;$('flash').disabled=!disks.length||state.running||!state.images.golden.ready;for(const button of $('teams').children)button.disabled=state.running;
+const percent=Math.max(0,Math.min(100,Number(state.progress)||0));$('fill').style.width=`${percent}%`;$('progress').setAttribute('aria-valuenow',percent.toFixed(1));$('phase').textContent=state.label||'Listo';const detail=[`${percent.toFixed(1)}%`];if(state.speed_mbps)detail.push(`${state.speed_mbps.toFixed(1)} MB/s`);if(state.eta_seconds)detail.push(`~${Math.ceil(state.eta_seconds)} s`);$('progressDetail').textContent=detail.join(' · ');$('error').hidden=!state.error;$('error').textContent=state.error||'';$('lastLog').textContent=(state.logs||[]).at(-1)||'La imagen se descarga y verifica automáticamente.'}
+async function session(){const response=await fetch(`${API}/api/session`,{cache:'no-store'});if(!response.ok)throw Error('lector incompatible');token=(await response.json()).token}
+async function refresh(){try{if(!token)await session();const response=await fetch(`${API}/api/state`,{cache:'no-store'});if(!response.ok)throw Error('lector no disponible');render(await response.json())}catch(error){token='';failures++;connected(false);$('diskStatus').innerHTML='<span class="dot"></span>Lector local cerrado';$('flash').disabled=true}finally{setTimeout(refresh,800)}}
+async function start(){const disk=$('disk').value;if(!disk||!token)return;const identity=name(selected);if(!confirm(`¿Borrar ${disk} y grabar ${identity}?\n\nTodos los archivos de esa tarjeta se perderán.`))return;const response=await fetch(`${API}/api/flash`,{method:'POST',headers:{'Content-Type':'application/json','X-CDMX-Token':token},body:JSON.stringify({disk,team:selected})});const body=await response.json();if(!response.ok){if(response.status===403)token='';alert(body.error||'No se pudo iniciar la grabación')}}
+$('flash').onclick=start;buildTeams();refresh();
+fetch('manifest.json',{cache:'no-store'}).then(r=>r.json()).then(manifest=>{$('version').textContent=`imagen ${manifest.version}`;$('mac').href=manifest.downloads.macos;$('windows').href=manifest.downloads.windows;$('imageLink').href=manifest.image.url}).catch(()=>{});
 </script>
 </html>

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import importlib.util
+import http.client
 from pathlib import Path
 import tempfile
+import threading
 import unittest
 
 
@@ -91,12 +93,60 @@ class ImagerTests(unittest.TestCase):
         self.assertIn("__CDMX_TOKEN__", html)
         self.assertNotIn("/api/repair", html)
 
+        public_html = (MODULE_PATH.parents[1] / "site" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("http://127.0.0.1:8766", public_html)
+        self.assertIn("/api/session", public_html)
+        self.assertIn("/api/flash", public_html)
+        self.assertIn("IDENTITIES", public_html)
+
     def test_job_reservation_is_atomic(self):
         state = imager.JobState()
         self.assertTrue(state.reserve())
         self.assertFalse(state.reserve())
         state.update(running=False)
         self.assertTrue(state.reserve())
+
+    def test_public_site_bridge_is_origin_locked(self):
+        server = imager.ImagerServer(("127.0.0.1", 0), "test-token")
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        port = server.server_address[1]
+        try:
+            connection = http.client.HTTPConnection("127.0.0.1", port, timeout=3)
+            connection.request("GET", "/api/session", headers={"Origin": imager.TRUSTED_WEB_ORIGIN})
+            response = connection.getresponse()
+            self.assertEqual(response.status, 200)
+            self.assertEqual(response.getheader("Access-Control-Allow-Origin"), imager.TRUSTED_WEB_ORIGIN)
+            self.assertEqual(response.getheader("Access-Control-Allow-Private-Network"), "true")
+            self.assertEqual(__import__("json").loads(response.read())["token"], "test-token")
+            connection.close()
+
+            connection = http.client.HTTPConnection("127.0.0.1", port, timeout=3)
+            connection.request("GET", "/api/session", headers={"Origin": "https://example.invalid"})
+            response = connection.getresponse()
+            self.assertEqual(response.status, 403)
+            response.read()
+            connection.close()
+
+            connection = http.client.HTTPConnection("127.0.0.1", port, timeout=3)
+            connection.request(
+                "OPTIONS",
+                "/api/flash",
+                headers={
+                    "Origin": imager.TRUSTED_WEB_ORIGIN,
+                    "Access-Control-Request-Method": "POST",
+                    "Access-Control-Request-Private-Network": "true",
+                },
+            )
+            response = connection.getresponse()
+            self.assertEqual(response.status, 204)
+            self.assertIn("POST", response.getheader("Access-Control-Allow-Methods", ""))
+            response.read()
+            connection.close()
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(timeout=3)
 
 
 if __name__ == "__main__":

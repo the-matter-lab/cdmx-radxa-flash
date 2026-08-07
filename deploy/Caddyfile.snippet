@@ -3,7 +3,7 @@
 handle @cdmx_radxa_flash {
 	root * /Users/Shared/srv/http/mantilla.ca/cdmx-radxa-flash
 	header {
-		Content-Security-Policy "default-src 'self'; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; img-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; form-action 'none'; base-uri 'none'"
+		Content-Security-Policy "default-src 'self'; connect-src 'self' http://127.0.0.1:8766; font-src 'self'; frame-ancestors 'none'; img-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; form-action 'none'; base-uri 'none'"
 		Permissions-Policy "camera=(), microphone=(), geolocation=()"
 		X-Frame-Options "DENY"
 	}

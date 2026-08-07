@@ -137,6 +137,11 @@ GitHub Release. Lepton serves `site/` and the verified image through Caddy and
 Cloudflare Tunnel. Reproducible site configuration lives in
 [`deploy/`](deploy/README.md).
 
+The public page talks only to the privileged helper on `127.0.0.1:8766`: it
+shows removable disks, identities, and progress, while physical reads and
+writes always happen on the laptop. The CORS bridge accepts only the Matter Lab
+public origin and preserves the per-process confirmation token.
+
 ## Security and reliability
 
 - Disk selection rejects the system disk, individual partitions, fixed internal

@@ -32,6 +32,7 @@ BUNDLE_ROOT = Path(getattr(sys, "_MEIPASS", SOURCE_ROOT))
 UI_PATH = BUNDLE_ROOT / "host" / "imager_ui.html"
 LOCAL_MANIFEST = BUNDLE_ROOT / "site" / "manifest.json"
 DEFAULT_MANIFEST_URL = "https://cdmx-radxaflash.mantilla.ca/manifest.json"
+TRUSTED_WEB_ORIGIN = "https://cdmx-radxaflash.mantilla.ca"
 LOCAL_GOLDEN_IMAGE = SOURCE_ROOT / "image" / "cdmx-workshop-golden.img.xz"
 MAC_DISK_PATTERN = re.compile(r"^/dev/disk[0-9]+$")
 LINUX_DISK_PATTERN = re.compile(r"^/dev/(?:sd[a-z]+|mmcblk[0-9]+)$")
@@ -667,7 +668,7 @@ def flash_job(disk: str, team: int | str) -> None:
 
 
 class ImagerHandler(BaseHTTPRequestHandler):
-    server_version = "CDMXImager/2.0"
+    server_version = "CDMXImager/2.1"
 
     def log_message(self, fmt: str, *args: object) -> None:
         return
@@ -683,8 +684,18 @@ class ImagerHandler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
+        self.cors_headers()
         self.end_headers()
         self.wfile.write(body)
+
+    def trusted_web_origin(self) -> bool:
+        return self.headers.get("Origin", "") == TRUSTED_WEB_ORIGIN
+
+    def cors_headers(self) -> None:
+        if self.trusted_web_origin():
+            self.send_header("Access-Control-Allow-Origin", TRUSTED_WEB_ORIGIN)
+            self.send_header("Access-Control-Allow-Private-Network", "true")
+            self.send_header("Vary", "Origin")
 
     def valid_host(self) -> bool:
         host = self.headers.get("Host", "").lower()
@@ -693,6 +704,18 @@ class ImagerHandler(BaseHTTPRequestHandler):
 
     def json_response(self, status: int, payload: object) -> None:
         self.response(status, "application/json; charset=utf-8", (json.dumps(payload, separators=(",", ":")) + "\n").encode())
+
+    def do_OPTIONS(self) -> None:  # noqa: N802
+        if not self.valid_host() or not self.path.startswith("/api/") or not self.trusted_web_origin():
+            self.json_response(HTTPStatus.FORBIDDEN, {"error": "origin not allowed"})
+            return
+        self.send_response(HTTPStatus.NO_CONTENT)
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, X-CDMX-Token")
+        self.send_header("Access-Control-Max-Age", "600")
+        self.cors_headers()
+        self.end_headers()
 
     def do_GET(self) -> None:  # noqa: N802
         if not self.valid_host():
@@ -716,6 +739,11 @@ class ImagerHandler(BaseHTTPRequestHandler):
             self.send_header("Referrer-Policy", "no-referrer")
             self.end_headers()
             self.wfile.write(body)
+        elif self.path == "/api/session":
+            if not self.trusted_web_origin():
+                self.json_response(HTTPStatus.FORBIDDEN, {"error": "origin not allowed"})
+                return
+            self.json_response(HTTPStatus.OK, {"token": self.token, "api": 2})
         elif self.path == "/api/state":
             self.json_response(HTTPStatus.OK, STATE.snapshot())
         else:

@@ -140,6 +140,12 @@ GitHub Release. El contenido de `site/` y la imagen verificada se sirven desde
 Lepton mediante Caddy y Cloudflare Tunnel. La configuración reproducible del
 sitio está en [`deploy/`](deploy/README.md).
 
+La web pública habla únicamente con el ayudante privilegiado en
+`127.0.0.1:8766`: muestra los discos extraíbles, las identidades y el progreso,
+pero la lectura y escritura física siempre ocurre en la laptop. El puente CORS
+acepta solo el origen público de Matter Lab y conserva el token de confirmación
+para cada proceso del ayudante.
+
 ## Seguridad y confiabilidad
 
 - La selección de disco rechaza el disco del sistema, particiones individuales,
