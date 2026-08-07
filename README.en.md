@@ -134,7 +134,8 @@ and checksums are versioned.
 
 Any `v*` tag automatically builds the macOS and Windows helpers and creates a
 GitHub Release. Lepton serves `site/` and the verified image through Caddy and
-Cloudflare Tunnel.
+Cloudflare Tunnel. Reproducible site configuration lives in
+[`deploy/`](deploy/README.md).
 
 ## Security and reliability
 

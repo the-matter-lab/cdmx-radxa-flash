@@ -137,7 +137,8 @@ metadatos y sumas se versionan.
 
 Un tag `v*` construye automáticamente los ayudantes macOS y Windows y crea un
 GitHub Release. El contenido de `site/` y la imagen verificada se sirven desde
-Lepton mediante Caddy y Cloudflare Tunnel.
+Lepton mediante Caddy y Cloudflare Tunnel. La configuración reproducible del
+sitio está en [`deploy/`](deploy/README.md).
 
 ## Seguridad y confiabilidad
 
