@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "version": "2026-08-06.5",
-  "published_at": "2026-08-06T00:00:00Z",
+  "version": "2026-08-06.6",
+  "published_at": "2026-08-07T02:20:03Z",
   "source": "https://github.com/the-matter-lab/cdmx-radxa-flash",
-  "docker": "bestquark/cdmx-radxa-zero3w:2026-08-06.5",
+  "docker": "bestquark/cdmx-radxa-zero3w:2026-08-06.6",
   "image": {
     "filename": "cdmx-workshop-golden.img.xz",
     "url": "https://cdmx-radxaflash.mantilla.ca/downloads/cdmx-workshop-golden.img.xz",
-    "sha512": "0500423136cb29c12584f9b95dcc65070fcb10555b43a04a7e84f681a83e8838a210c6f10b5e7f6f35be89f82aa732679f9ac12f9d6dfb5c207510e78053405e",
-    "compressed_bytes": 1905626664,
+    "sha512": "403c77a7b3447e833a802cb6dd154f0a30a90ada4829e886d83537a0098099e79be94e0a73d0908ab7ebede76b44aa2dd156ca0a563709e5066fb0539ddde172",
+    "compressed_bytes": 1899517804,
     "uncompressed_bytes": 8074662912
   },
   "downloads": {
