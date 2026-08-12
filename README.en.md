@@ -140,9 +140,11 @@ image/cdmx-workshop-golden.img.xz
 image/cdmx-workshop-golden.img.xz.sha512
 ```
 
-Before publishing, update `version`, sizes, SHA-512, and `docker` in
-`site/manifest.json`. The public site and both helpers consume that same file,
-so every operator flashes exactly the same version.
+Before publishing, update `version`, sizes, SHA-512, `docker`, and the immutable
+`simulator` commits in `site/manifest.json`. The public site, both helpers, and
+the [workshop simulator](https://radxa-simulator.mantilla.ca) consume that same
+file, so they all use exactly the same version. Lepton checks the manifest every
+five minutes and refreshes the simulator when that fingerprint changes.
 
 ## Docker and publication
 
