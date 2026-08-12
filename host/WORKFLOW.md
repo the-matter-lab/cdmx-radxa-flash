@@ -23,6 +23,19 @@ La acción **Desinstalar** de la web muestra un comando por sistema operativo.
 Elimina el código descargado, `.venv-imager` y la imagen en caché, y detiene
 solo el proceso `imager_app.py` instalado por este lector. No toca las SD.
 
+Si una versión anterior llegó a 98.5%, aprobó la verificación completa y falló
+solo al asignar la identidad, no vuelva a grabar los 8 GB. Con la versión
+corregida puede terminar esa tarjeta en segundos:
+
+```bash
+sudo .venv-imager/bin/python host/imager_app.py \
+  --provision-only /dev/diskN --team admin
+```
+
+Cambie `/dev/diskN` por el disco extraíble y `admin` por `0`–`9` cuando
+corresponda. Este modo exige el marcador de la imagen del taller en la
+partición de configuración y rechaza otros discos.
+
 ## Desde el código fuente en macOS
 
 Abra `host/start-imager.command`. La primera ejecución crea `.venv-imager` e
