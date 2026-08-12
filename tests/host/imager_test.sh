@@ -156,6 +156,15 @@ assert_eq 2 "$(grep -c 'status = "disabled";' "$ROOT/device/overlays/cdmx-zero3w
   'custom I2C overlay disables FIQ debugger and UART2'
 assert_eq 2 "$(sed -n '/cdmx-color-lab.conf/,/^EOF$/p' "$ROOT/device/install.sh" | grep -c '^i2c-')" \
   'software I2C kernel modules load at boot'
+assert_eq d8631d0f0ac2b9aa0c3ac70285d421018ce274ac6fd6fe95a9aa7ee39b17edd0 \
+  "$(sha256sum "$ROOT/device/modules/i2c-gpio/i2c-gpio.c" | awk '{print $1}')" \
+  'vendored i2c-gpio source matches upstream Linux v6.1.84'
+assert_eq 1 "$(grep -c '^supported_kernel_release=6.1.84-10-rk2410-nocsf$' "$ROOT/device/install.sh")" \
+  'i2c-gpio module build is pinned to the exact Radxa kernel ABI'
+assert_eq 1 "$(grep -c 'module_vermagic=$(modinfo -F vermagic' "$ROOT/device/install.sh")" \
+  'i2c-gpio module vermagic is verified before installation'
+assert_eq 1 "$(grep -c 'console=ttyFIQ0,\*|earlycon|earlycon=\*)' "$ROOT/device/install.sh")" \
+  'FIQ console and earlycon are removed before extlinux regeneration'
 if command -v dtc >/dev/null 2>&1; then
   dtc -@ -I dts -O dtb -o "$tmp/cdmx-zero3w-i2c-gpio.dtbo" \
     "$ROOT/device/overlays/cdmx-zero3w-i2c-gpio.dts"

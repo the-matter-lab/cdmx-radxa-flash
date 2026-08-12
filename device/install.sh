@@ -80,7 +80,7 @@ if ! $skip_upgrade; then
     apt-get -y full-upgrade
 fi
 apt-get install -y --no-install-recommends \
-    avahi-daemon bash ca-certificates curl feh geany git device-tree-compiler i2c-tools jq locales nano \
+    avahi-daemon bash build-essential ca-certificates curl feh geany git device-tree-compiler i2c-tools jq kmod locales nano \
     network-manager novnc openbox openssh-server python3 python3-matplotlib \
     python3-numpy python3-pil python3-pip python3-smbus python3-spidev \
     python3-venv rfkill sudo tigervnc-standalone-server \
@@ -120,6 +120,49 @@ dtc -@ -I dts -O dtb \
     -o /boot/dtbo/cdmx-zero3w-i2c-gpio.dtbo \
     "$repo_root/device/overlays/cdmx-zero3w-i2c-gpio.dts"
 
+# RadxaOS 6.1.84-10 deliberately ships CONFIG_I2C_GPIO disabled. Build the
+# upstream v6.1.84 driver against the exact installed Radxa headers; never load
+# a module compiled for a merely similar kernel ABI.
+supported_kernel_release=6.1.84-10-rk2410-nocsf
+kernel_config="/boot/config-$supported_kernel_release"
+kernel_build="/lib/modules/$supported_kernel_release/build"
+if [[ ! -r $kernel_config || ! -d $kernel_build ]]; then
+    printf 'Required RadxaOS kernel/header pair %s is not installed.\n' \
+        "$supported_kernel_release" >&2
+    exit 69
+fi
+if grep -qx 'CONFIG_I2C_GPIO=y' "$kernel_config"; then
+    : # A future rebuild may include the driver in-kernel.
+elif grep -qx 'CONFIG_I2C_GPIO=m' "$kernel_config" && \
+        modinfo -k "$supported_kernel_release" i2c-gpio >/dev/null 2>&1; then
+    : # Or Radxa may begin shipping its own version-matched module.
+elif grep -qx '# CONFIG_I2C_GPIO is not set' "$kernel_config"; then
+    module_build_dir=$(mktemp -d)
+    trap 'rm -rf -- "$module_build_dir"' EXIT
+    install -m 0644 "$repo_root/device/modules/i2c-gpio/Makefile" \
+        "$repo_root/device/modules/i2c-gpio/i2c-gpio.c" "$module_build_dir/"
+    make -s -C "$kernel_build" M="$module_build_dir" modules
+    module_vermagic=$(modinfo -F vermagic "$module_build_dir/i2c-gpio.ko")
+    case "$module_vermagic" in
+        "$supported_kernel_release "*) ;;
+        *)
+            printf 'Refusing i2c-gpio module with mismatched vermagic: %s\n' \
+                "$module_vermagic" >&2
+            exit 65
+            ;;
+    esac
+    install -d -m 0755 \
+        "/lib/modules/$supported_kernel_release/updates/cdmx"
+    install -m 0644 "$module_build_dir/i2c-gpio.ko" \
+        "/lib/modules/$supported_kernel_release/updates/cdmx/i2c-gpio.ko"
+    depmod -a "$supported_kernel_release"
+    rm -rf -- "$module_build_dir"
+    trap - EXIT
+else
+    printf 'Unsupported I2C_GPIO state in %s.\n' "$kernel_config" >&2
+    exit 69
+fi
+
 # The NeoPixel remains on SPI3-M1 MOSI (physical pin 19). RadxaOS ships the
 # SPI3 spidev overlay disabled by filename, so enable it without rsetup.
 overlay=rk3568-spi3-m1-cs0-spidev.dtbo
@@ -131,6 +174,20 @@ cat > /etc/modules-load.d/cdmx-color-lab.conf <<'EOF'
 i2c-dev
 i2c-gpio
 EOF
+# Pin 8 is no longer a serial console. Remove both the FIQ console and generic
+# earlycon before regenerating extlinux, otherwise firmware/kernel boot may
+# still drive the software-I2C clock pin.
+if [[ -r /etc/kernel/cmdline ]]; then
+    read -r -a kernel_args < /etc/kernel/cmdline
+    filtered_kernel_args=()
+    for kernel_arg in "${kernel_args[@]}"; do
+        case "$kernel_arg" in
+            console=ttyFIQ0,*|earlycon|earlycon=*) ;;
+            *) filtered_kernel_args+=("$kernel_arg") ;;
+        esac
+    done
+    printf '%s\n' "${filtered_kernel_args[*]}" > /etc/kernel/cmdline
+fi
 if command -v u-boot-update >/dev/null 2>&1; then
     u-boot-update
 fi
