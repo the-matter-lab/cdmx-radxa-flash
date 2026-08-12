@@ -2,66 +2,52 @@ MATTER LAB INTERNATIONAL CONFERENCE 2026 - SATELLITE SCHOOL
 
 INICIO RAPIDO
 
-La barra inferior siempre permanece disponible:
+La barra inferior tiene APPS, Terminal, Code, Agent y Monitor. AGENTS y BAYES
+son los dos escritorios. El codigo del equipo vive en ~/workspace.
 
-  APPS       aplicaciones y ventanas abiertas
-  Terminal   terminal nueva dentro de ~/workspace
-  Code       editor grafico
-  Agent      abre Pi Agent
-  Monitor    CPU, memoria y procesos
-
-AGENTS y BAYES son los dos escritorios. Cada ventana abierta aparece como un
-boton en la barra inferior; haga clic para ocultarla o restaurarla.
-
-El codigo del equipo vive en ~/workspace. Para descargarlo desde Terminal:
-
-  ./get-bayesopt-code
-  ./get-localai-code
-
-No necesita una cuenta de GitHub. El script actualiza un clon existente sin
-sobrescribir otros archivos.
-
-FLUJO BAYESOPT
+LABORATORIO DE COLOR (manual)
 
   ./get-bayesopt-code
   cd cdmx-bayesopt
-  ./scripts/install-color-lab.sh
+  ./scripts/color-lab.sh
 
-Abra http://equipoN.local:8010/ para controlar el LED y ver el sensor. Luego
-edite examples/hardware_objective.py y ejecute:
+Abra http://equipoN.local:8010/. Ctrl-C detiene el sitio y el muestreo.
 
-  ./scripts/run-color-campaign.sh
+BAYESOPT
 
-Abra http://equipoN.local:8000/ para seguir la campana.
+Primero detenga Color Lab. Luego:
 
-CABLEADO
+  ./scripts/bayesopt.sh '#4A80C0'
 
-TCS34725: VCC=pin 4, GND=pin 6, SCL=pin 8, SDA=pin 10.
-NeoPixel: DIN=pin 19, GND=pin 20, 5V separado=pin 2.
+Abra http://equipoN.local:8000/. Ctrl-C detiene la campana. BayesOpt usa el
+sensor y el LED directamente; no deja Color Lab abierto.
+
+Los GPIO permanecen configurados durante todo el taller:
+TCS34725: VCC=4, GND=6, SCL=8, SDA=10.
+NeoPixel: VCC=2, DIN=19, GND=20.
 
 QUICK START
 
-The persistent bottom panel contains APPS, Terminal, Code, Agent, and Monitor.
-AGENTS and BAYES are the two desktops. Open windows also appear in the panel;
-click their buttons to hide or restore them.
+The bottom panel has APPS, Terminal, Code, Agent, and Monitor. AGENTS and BAYES
+are the two desktops. Team code lives in ~/workspace.
 
-Team code lives in ~/workspace. Download it from Terminal without a GitHub
-account:
-
-  ./get-bayesopt-code
-  ./get-localai-code
-
-BAYESOPT FLOW
+COLOR LAB (manual)
 
   ./get-bayesopt-code
   cd cdmx-bayesopt
-  ./scripts/install-color-lab.sh
+  ./scripts/color-lab.sh
 
-Open http://equipoN.local:8010/ for LED control and sensor readings. Edit
-examples/hardware_objective.py, run ./scripts/run-color-campaign.sh, and open
-http://equipoN.local:8000/ to follow the campaign.
+Open http://equipoN.local:8010/. Ctrl-C stops both the site and sampling.
 
-WIRING
+BAYESOPT
 
-TCS34725: VCC=pin 4, GND=pin 6, SCL=pin 8, SDA=pin 10.
-NeoPixel: DIN=pin 19, GND=pin 20, separate 5V=pin 2.
+Stop Color Lab first, then run:
+
+  ./scripts/bayesopt.sh '#4A80C0'
+
+Open http://equipoN.local:8000/. Ctrl-C stops the campaign. BayesOpt uses the
+sensor and LED directly; it does not leave Color Lab running.
+
+GPIO stays configured throughout the workshop:
+TCS34725: VCC=4, GND=6, SCL=8, SDA=10.
+NeoPixel: VCC=2, DIN=19, GND=20.

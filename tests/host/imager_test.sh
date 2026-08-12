@@ -129,6 +129,8 @@ assert_eq 0 "$(grep -c 'Get workshop code\|Get code' "$ROOT/device/desktop/menu.
   'desktop menu has no code-download button'
 assert_eq 1 "$(grep -c 'https://github.com/the-matter-lab/cdmx-bayesopt.git' "$ROOT/device/desktop/get-bayesopt-code")" \
   'workspace BayesOpt script downloads only BayesOpt'
+assert_eq 1 "$(grep -c 'pip install --no-build-isolation --no-deps --editable' "$ROOT/device/desktop/get-bayesopt-code")" \
+  'workspace BayesOpt download also prepares its local environment'
 assert_eq 1 "$(grep -c 'https://github.com/the-matter-lab/cdmx-local-ai.git' "$ROOT/device/desktop/get-localai-code")" \
   'workspace Local AI script downloads only Local AI'
 assert_eq 'panel_position = bottom center horizontal' \
@@ -198,6 +200,12 @@ assert_eq 2 "$(grep -c 'status = "disabled";' "$ROOT/device/overlays/cdmx-zero3w
   'custom I2C overlay disables FIQ debugger and UART2'
 assert_eq 2 "$(sed -n '/cdmx-color-lab.conf/,/^EOF$/p' "$ROOT/device/install.sh" | grep -c '^i2c-')" \
   'software I2C kernel modules load at boot'
+assert_eq 1 "$(grep -c 'systemctl disable --now cdmx-color-lab.service' "$ROOT/device/install.sh")" \
+  'Color Lab web process is not an always-on image service'
+assert_eq 1 "$(grep -c 'systemd-journal,i2c,spi,spidev' "$ROOT/device/install.sh")" \
+  'workshop user receives permanent hardware device group access'
+assert_eq 1 "$(grep -c 'KERNEL==\"i2c-\[0-9\]\*\"' "$ROOT/device/install.sh")" \
+  'I2C device permissions are installed in the image'
 assert_eq d8631d0f0ac2b9aa0c3ac70285d421018ce274ac6fd6fe95a9aa7ee39b17edd0 \
   "$(sha256sum "$ROOT/device/modules/i2c-gpio/i2c-gpio.c" | awk '{print $1}')" \
   'vendored i2c-gpio source matches upstream Linux v6.1.84'

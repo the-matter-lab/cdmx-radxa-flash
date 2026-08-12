@@ -7,3 +7,10 @@ if [[ -d cdmx-bayesopt/.git ]]; then
 else
     git clone https://github.com/the-matter-lab/cdmx-bayesopt.git cdmx-bayesopt
 fi
+
+cd cdmx-bayesopt
+python3 -m venv --system-site-packages .venv
+.venv/bin/python -m pip install --no-build-isolation --no-deps --editable .
+
+printf '\nReady. Open Color Lab with:\n'
+printf '  cd ~/workspace/cdmx-bayesopt && ./scripts/color-lab.sh\n'

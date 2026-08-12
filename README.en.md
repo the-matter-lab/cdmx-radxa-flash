@@ -77,12 +77,15 @@ and asks for one administrator authorization. The existing
   after normal power cycles.
 - Python dependencies, GPIO-backed I²C on physical pins 8/10, and SPI3-M1 for
   the color lab. The custom overlay disables FIQ/UART2 on those pins.
+- GPIO configuration remains active from boot; Color Lab starts manually with
+  `scripts/color-lab.sh`, and `Ctrl-C` stops its site and sampling.
 - An exact `cdmx-local-ai` version pinned in
   [`image/cdmx-local-ai.env`](image/cdmx-local-ai.env); agent code is not
   duplicated here.
 - Two visible scripts in `~/workspace`, `get-localai-code` and
-  `get-bayesopt-code`, clone or update only the selected repository. Exercise
-  repositories are not pre-cloned.
+  `get-bayesopt-code`, clone or update only the selected repository. The latter
+  also prepares its Python environment without `sudo`. Exercise repositories
+  are not pre-cloned.
 - Simple `~/workspace` path, persistent buttons for reopening apps, and
   separate memory ceilings for 1 GB team boards and the 2 GB admin board.
 

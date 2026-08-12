@@ -88,6 +88,7 @@ apt-get install -y --no-install-recommends \
     avahi-daemon bash build-essential ca-certificates curl feh geany git device-tree-compiler i2c-tools jq kmod locales nano \
     network-manager novnc openbox openssh-server python3 python3-matplotlib \
     python3-numpy python3-pil python3-pip python3-smbus python3-spidev \
+    python3-setuptools python3-wheel \
     python3-venv rfkill sudo tigervnc-standalone-server \
     tint2 tmux tzdata ufw unattended-upgrades websockify x11-xserver-utils xauth xdotool xterm \
     zram-tools
@@ -98,7 +99,10 @@ printf '%s\n' "$workshop_timezone" > /etc/timezone
 if ! id "$workshop_user" >/dev/null 2>&1; then
     adduser --disabled-password --gecos 'CDMX workshop team' "$workshop_user"
 fi
-usermod -aG audio,video,render,plugdev,sudo,systemd-journal "$workshop_user"
+for hardware_group in i2c spi spidev; do
+    getent group "$hardware_group" >/dev/null || groupadd --system "$hardware_group"
+done
+usermod -aG audio,video,render,plugdev,sudo,systemd-journal,i2c,spi,spidev "$workshop_user"
 passwd --lock "$workshop_user" >/dev/null
 install -d -m 0755 /etc/sudoers.d
 cat > /etc/sudoers.d/90-cdmx-workshop <<EOF
@@ -181,6 +185,11 @@ install -d -m 0755 /etc/modules-load.d
 cat > /etc/modules-load.d/cdmx-color-lab.conf <<'EOF'
 i2c-dev
 i2c-gpio
+EOF
+install -d -m 0755 /etc/udev/rules.d
+cat > /etc/udev/rules.d/99-cdmx-color-lab.rules <<'EOF'
+KERNEL=="i2c-[0-9]*", GROUP="i2c", MODE="0660"
+KERNEL=="spidev*", GROUP="spi", MODE="0660"
 EOF
 # Pin 8 is no longer a serial console. Remove both the FIQ console and generic
 # earlycon before regenerating extlinux, otherwise firmware/kernel boot may
@@ -297,6 +306,15 @@ for unit in /opt/cdmx-radxa-flash/device/systemd/*.service /opt/cdmx-radxa-flash
     [[ -e $unit ]] || continue
     install -m 0644 "$unit" "/etc/systemd/system/$(basename "$unit")"
 done
+
+# GPIO support is permanent, but the Color Lab web process is deliberately
+# manual. Remove the legacy always-on unit when upgrading an older card.
+if $offline_image; then
+    systemctl disable cdmx-color-lab.service 2>/dev/null || true
+else
+    systemctl disable --now cdmx-color-lab.service 2>/dev/null || true
+fi
+rm -f /etc/systemd/system/cdmx-color-lab.service
 
 rm -f /etc/cdmx-radxa-flash/vnc.passwd
 

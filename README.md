@@ -76,11 +76,14 @@ comandos existente con `host/flash-team.sh`.
   que vuelven a iniciar después de un ciclo normal de energía.
 - Dependencias Python, I²C por GPIO en los pines físicos 8/10 y SPI3-M1 para el
   laboratorio de color. El overlay propio desactiva FIQ/UART2 en esos pines.
+- La configuración GPIO permanece activa desde el arranque; Color Lab se abre
+  manualmente con `scripts/color-lab.sh` y `Ctrl-C` detiene sitio y muestreo.
 - Una versión exacta de `cdmx-local-ai`, fijada en
   [`image/cdmx-local-ai.env`](image/cdmx-local-ai.env); el código del agente no
   se duplica aquí.
 - Dos scripts visibles en `~/workspace`, `get-localai-code` y
   `get-bayesopt-code`, que clonan o actualizan solamente el repositorio elegido.
+  El segundo también prepara su entorno Python sin pedir `sudo`.
   Los repositorios de ejercicios no se clonan de antemano.
 - Ruta sencilla `~/workspace`, botones para reabrir aplicaciones y límites de
   memoria distintos para los equipos de 1 GB y la placa admin de 2 GB.
