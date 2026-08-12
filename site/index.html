@@ -11,9 +11,9 @@ main{width:min(680px,calc(100% - 28px));margin:0 auto;padding:30px 0 48px}.top{d
 .intro{margin:64px 0 28px}.intro h1{margin:0 0 8px;font-size:clamp(34px,7vw,52px);line-height:1;letter-spacing:-.055em}.intro p{margin:0;color:var(--muted);font-size:17px}
 .panel{border:1px solid var(--line);border-radius:18px;background:rgba(11,16,13,.9);padding:20px;margin-top:12px}.row{display:flex;align-items:center;justify-content:space-between;gap:16px}.label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.09em}.status{font-weight:700;text-align:right}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#58635c;margin-right:7px}.online .dot{background:var(--green);box-shadow:0 0 14px var(--green)}
 select{width:100%;margin-top:13px;padding:12px;border:1px solid var(--line);border-radius:11px;background:#0e1511;color:var(--text);font:inherit}.teams{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-top:14px}.team{border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--text);padding:11px 3px;font:700 14px inherit;cursor:pointer}.team:hover{border-color:#668071}.team.selected{border-color:var(--green);background:var(--green);color:#062012}.team:last-child{grid-column:span 2}.action{width:100%;margin-top:14px;padding:13px;border:0;border-radius:11px;background:var(--green);color:#062012;font:800 15px inherit;cursor:pointer}.action:disabled{opacity:.3;cursor:not-allowed}
-.progress{height:8px;margin:15px 0 9px;border-radius:999px;overflow:hidden;background:#172019}.fill{height:100%;width:0;background:var(--green);transition:width .3s}.detail{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:13px}.phase{color:var(--text);font-weight:700}.error{color:var(--danger);margin:10px 0 0}.hint{color:var(--muted);font-size:13px;margin:10px 0 0}.offline{display:none}.offline.show{display:block}.terminal{display:flex;align-items:stretch;gap:8px;margin-top:14px}.terminal code{min-width:0;flex:1;padding:11px 12px;border:1px solid var(--line);border-radius:9px;background:#050806;color:#d9e6dd;font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto;white-space:nowrap;user-select:all}.offline .buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.smallButton{border:1px solid var(--line);border-radius:9px;padding:9px 12px;background:transparent;color:var(--text);text-decoration:none;font:700 13px inherit;cursor:pointer}.smallButton.primary{background:var(--green);border-color:var(--green);color:#062012}.smallButton.copy{margin:0;white-space:nowrap}
+.progress{height:8px;margin:15px 0 9px;border-radius:999px;overflow:hidden;background:#172019}.fill{height:100%;width:0;background:var(--green);transition:width .3s}.detail{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:13px}.phase{color:var(--text);font-weight:700}.error{color:var(--danger);margin:10px 0 0}.hint{color:var(--muted);font-size:13px;margin:10px 0 0}.offline{display:none}.offline.show{display:block}.platforms{display:flex;gap:6px;margin-top:12px}.platform{padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--muted);font:700 12px inherit;cursor:pointer}.platform.selected{border-color:#52705d;background:#16231b;color:var(--green)}.platformHint{margin:9px 0 0;color:var(--muted);font-size:12px}.terminal{display:flex;align-items:stretch;gap:7px;margin-top:8px}.terminal code{min-width:0;flex:1;padding:10px 11px;border:1px solid var(--line);border-radius:9px;background:#050806;color:#d9e6dd;font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto;white-space:nowrap;user-select:all}.copyIcon{display:grid;place-items:center;width:40px;flex:0 0 40px;border:1px solid var(--line);border-radius:9px;background:var(--green);color:#062012;cursor:pointer}.copyIcon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8}.copyIcon.copied{background:#b7ffca}.offlineFoot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}.scriptLink{color:var(--muted);font-size:12px;text-decoration:none}.scriptLink:hover{color:var(--green)}.retry{border:0;background:transparent;color:var(--muted);font:700 12px inherit;cursor:pointer}.retry:hover{color:var(--green)}
 footer{display:flex;justify-content:space-between;gap:16px;margin-top:24px;color:#6f7d74;font-size:12px}footer div{display:flex;gap:14px}footer a{color:#91a097;text-decoration:none}footer a:hover{color:var(--green)}
-@media(max-width:560px){main{padding-top:22px}.intro{margin-top:46px}.teams{grid-template-columns:repeat(4,1fr)}.team:last-child{grid-column:span 2}.detail,footer{display:block}.detail span:last-child{display:block;margin-top:3px}footer div{margin-top:8px}.terminal{display:block}.terminal code{display:block;width:100%}.smallButton.copy{width:100%;margin-top:8px}}
+@media(max-width:560px){main{padding-top:22px}.intro{margin-top:46px}.teams{grid-template-columns:repeat(4,1fr)}.team:last-child{grid-column:span 2}.detail,footer{display:block}.detail span:last-child{display:block;margin-top:3px}footer div{margin-top:8px}}
 </style>
 <main>
   <header class="top">
@@ -49,17 +49,22 @@ footer{display:flex;justify-content:space-between;gap:16px;margin-top:24px;color
   </section>
 
   <section class="panel offline" id="offline">
-    <div class="row"><span class="label">Lector local</span><span class="status">Inícialo en Terminal</span></div>
-    <p class="hint">Safari y Chrome no pueden escribir discos directamente. En una Mac, copia esta línea, abre Terminal, pégala y presiona Enter:</p>
+    <div class="row"><span class="label">Lector local</span><span class="status">Sin iniciar</span></div>
+    <div class="platforms" id="platforms" role="group" aria-label="Sistema operativo">
+      <button class="platform" data-platform="macos" type="button">macOS</button>
+      <button class="platform" data-platform="windows" type="button">Windows</button>
+      <button class="platform" data-platform="linux" type="button">Linux</button>
+    </div>
+    <p class="platformHint" id="platformHint">Terminal · pega y presiona Enter.</p>
     <div class="terminal">
       <code id="terminalCommand">/bin/bash -c "$(curl -fsSL https://cdmx-radxaflash.mantilla.ca/start-macos.sh)"</code>
-      <button class="smallButton primary copy" id="copyCommand" type="button">Copiar comando</button>
+      <button class="copyIcon" id="copyCommand" type="button" aria-label="Copiar comando" title="Copiar comando">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+      </button>
     </div>
-    <p class="hint">Descarga código fuente verificado, no una app sin firma. macOS pedirá una sola autorización para escribir la SD; esta página se conectará automáticamente.</p>
-    <div class="buttons">
-      <button class="smallButton primary" id="retry" type="button">Volver a intentar</button>
-      <a class="smallButton" href="start-macos.sh">Ver script de macOS</a>
-      <a class="smallButton" id="windows" href="https://github.com/the-matter-lab/cdmx-radxa-flash/releases/latest">Instalar en Windows</a>
+    <div class="offlineFoot">
+      <a class="scriptLink" id="scriptLink" href="start-macos.sh">Ver script para macOS</a>
+      <button class="retry" id="retry" type="button">Reintentar</button>
     </div>
   </section>
 
@@ -71,13 +76,16 @@ footer{display:flex;justify-content:space-between;gap:16px;margin-top:24px;color
 <script>
 const API='http://127.0.0.1:8766';
 const IDENTITIES=[0,1,2,3,4,5,6,7,8,9,'admin'];
-let token='',selected=0,lastState=null,failures=0;
+const LAUNCHERS={macos:{label:'macOS',hint:'Terminal · pega y presiona Enter.',script:'start-macos.sh',command:'/bin/bash -c "$(curl -fsSL https://cdmx-radxaflash.mantilla.ca/start-macos.sh)"'},windows:{label:'Windows',hint:'PowerShell como administrador · pega y Enter.',script:'start-windows.ps1',command:'powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://cdmx-radxaflash.mantilla.ca/start-windows.ps1 | iex"'},linux:{label:'Linux',hint:'Terminal · pega y presiona Enter.',script:'start-linux.sh',command:'/bin/bash -c "$(curl -fsSL https://cdmx-radxaflash.mantilla.ca/start-linux.sh)"'}};
+let token='',selected=0,lastState=null,failures=0,platform='macos';
 const $=id=>document.getElementById(id);
 const name=id=>id==='admin'?'admin':`equipo${id}`;
 const size=n=>n?`${(n/1e9).toFixed(2)} GB`:'—';
 
 function buildTeams(){for(const id of IDENTITIES){const button=document.createElement('button');button.type='button';button.className='team';button.dataset.identity=String(id);button.textContent=id==='admin'?'Admin':id;button.onclick=()=>{selected=id;renderIdentity()};$('teams').appendChild(button)}renderIdentity()}
 function renderIdentity(){for(const button of $('teams').children)button.classList.toggle('selected',button.dataset.identity===String(selected));$('imageStatus').textContent=name(selected);$('flash').textContent=`Borrar y grabar ${name(selected)}`}
+function selectPlatform(value){platform=value;const launcher=LAUNCHERS[value];for(const button of $('platforms').children)button.classList.toggle('selected',button.dataset.platform===value);$('platformHint').textContent=launcher.hint;$('terminalCommand').textContent=launcher.command;$('scriptLink').textContent=`Ver script para ${launcher.label}`;$('scriptLink').href=launcher.script}
+function buildPlatforms(){for(const button of $('platforms').children)button.onclick=()=>selectPlatform(button.dataset.platform);const ua=navigator.userAgent;selectPlatform(/Windows/i.test(ua)?'windows':/Linux/i.test(ua)?'linux':'macos')}
 function connected(value){$('devicePanel').classList.toggle('online',value);$('offline').classList.toggle('show',!value&&failures>1)}
 function render(state){lastState=state;connected(true);failures=0;const disks=state.disks||[],select=$('disk'),before=select.value;select.replaceChildren();for(const disk of disks){const option=document.createElement('option');option.value=disk.id;option.textContent=`${disk.name} · ${size(disk.size)} · ${disk.protocol}`;select.appendChild(option)}if(disks.some(d=>d.id===before))select.value=before;if(!disks.length){const option=document.createElement('option');option.textContent='Inserta una tarjeta SD';select.appendChild(option)}select.disabled=!disks.length||state.running;
 $('diskStatus').innerHTML=`<span class="dot"></span>${disks.length?disks.length===1?'1 tarjeta detectada':`${disks.length} tarjetas detectadas`:'Sin tarjeta'}`;$('flash').disabled=!disks.length||state.running||!state.images.golden.ready;for(const button of $('teams').children)button.disabled=state.running;
@@ -85,8 +93,8 @@ const percent=Math.max(0,Math.min(100,Number(state.progress)||0));$('fill').styl
 async function session(){const response=await fetch(`${API}/api/session`,{cache:'no-store'});if(!response.ok)throw Error('lector incompatible');token=(await response.json()).token}
 async function refresh(){try{if(!token)await session();const response=await fetch(`${API}/api/state`,{cache:'no-store'});if(!response.ok)throw Error('lector no disponible');render(await response.json())}catch(error){token='';failures++;connected(false);$('diskStatus').innerHTML='<span class="dot"></span>Lector local cerrado';$('flash').disabled=true}finally{setTimeout(refresh,800)}}
 async function start(){const disk=$('disk').value;if(!disk||!token)return;const identity=name(selected);if(!confirm(`¿Borrar ${disk} y grabar ${identity}?\n\nTodos los archivos de esa tarjeta se perderán.`))return;const response=await fetch(`${API}/api/flash`,{method:'POST',headers:{'Content-Type':'application/json','X-CDMX-Token':token},body:JSON.stringify({disk,team:selected})});const body=await response.json();if(!response.ok){if(response.status===403)token='';alert(body.error||'No se pudo iniciar la grabación')}}
-async function copyCommand(){const button=$('copyCommand'),command=$('terminalCommand').textContent.trim();let copied=false;try{await navigator.clipboard.writeText(command);copied=true}catch(error){const input=document.createElement('textarea');input.value=command;input.setAttribute('readonly','');input.style.position='fixed';input.style.opacity='0';document.body.appendChild(input);input.select();copied=document.execCommand('copy');input.remove()}button.textContent=copied?'Copiado':'Selecciona y copia';setTimeout(()=>button.textContent='Copiar comando',1800)}
-$('flash').onclick=start;$('copyCommand').onclick=copyCommand;$('retry').onclick=()=>{token='';failures=0;$('offline').classList.remove('show')};buildTeams();refresh();
-fetch('manifest.json',{cache:'no-store'}).then(r=>r.json()).then(manifest=>{$('version').textContent=`imagen ${manifest.version}`;$('windows').href=manifest.downloads.windows;$('imageLink').href=manifest.image.url}).catch(()=>{});
+async function copyCommand(){const button=$('copyCommand'),command=$('terminalCommand').textContent.trim();let copied=false;try{await navigator.clipboard.writeText(command);copied=true}catch(error){const input=document.createElement('textarea');input.value=command;input.setAttribute('readonly','');input.style.position='fixed';input.style.opacity='0';document.body.appendChild(input);input.select();copied=document.execCommand('copy');input.remove()}if(copied){button.classList.add('copied');button.setAttribute('aria-label','Copiado');button.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>';setTimeout(()=>{button.classList.remove('copied');button.setAttribute('aria-label','Copiar comando');button.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>'},1500)}}
+$('flash').onclick=start;$('copyCommand').onclick=copyCommand;$('retry').onclick=()=>{token='';failures=0;$('offline').classList.remove('show')};buildTeams();buildPlatforms();refresh();
+fetch('manifest.json',{cache:'no-store'}).then(r=>r.json()).then(manifest=>{$('version').textContent=`imagen ${manifest.version}`;$('imageLink').href=manifest.image.url}).catch(()=>{});
 </script>
 </html>

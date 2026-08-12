@@ -18,9 +18,8 @@ Participants work in two separate repositories:
 Open **[cdmx-radxaflash.mantilla.ca](https://cdmx-radxaflash.mantilla.ca)**:
 
 1. Insert an SD card of at least 8 GB.
-2. On macOS, copy the Terminal line from the page, paste it, and enter the
-   Mac password when `sudo` requests it. On Windows, run
-   `CDMX-Radxa-Flasher.exe` as Administrator.
+2. Choose macOS, Windows, or Linux on the page and copy the command. Paste it
+   into Terminal or an Administrator PowerShell window.
 3. Select the removable drive and `equipo0`–`equipo9` or `admin`.
 4. Confirm the erase and wait for both writing **and read-back verification** to
    reach 100%.
@@ -31,16 +30,23 @@ the target before erasing, and downloads the version declared in
 [`site/manifest.json`](site/manifest.json). It caches the image and SHA-512 for
 subsequent cards.
 
-On macOS, the command downloads source pinned to one commit, verifies its
-SHA-256, and runs it with local Python. This avoids Gatekeeper's unsigned-app
+All three commands download source pinned to one commit, verify its SHA-256,
+and run it with local Python. On macOS this avoids Gatekeeper's unsigned-app
 block. The password only authorizes removable-disk access; it is neither stored
 nor written to the Radxa.
 
-### Run from source on macOS
+### Run from source
 
 ```bash
+# macOS
 /bin/bash -c "$(curl -fsSL https://cdmx-radxaflash.mantilla.ca/start-macos.sh)"
+
+# Linux
+/bin/bash -c "$(curl -fsSL https://cdmx-radxaflash.mantilla.ca/start-linux.sh)"
 ```
+
+On Windows, open PowerShell as Administrator and copy the command shown on the
+site. The “View script” links expose all three launchers for inspection.
 
 The launcher creates a local Python environment, installs the pinned FAT writer,
 and asks for one administrator authorization. The existing

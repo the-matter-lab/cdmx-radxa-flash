@@ -9,4 +9,4 @@ test:
 	@for file in $$(find host device site -type f \( -name '*.sh' -o -name cdmx-network \)); do bash -n "$$file"; done
 
 shellcheck:
-	shellcheck -x --exclude=SC1091 host/*.sh host/lib/*.sh device/*.sh device/*/*.sh device/network/cdmx-network tests/host/*.sh
+	shellcheck -x --exclude=SC1091 host/*.sh host/lib/*.sh site/*.sh device/*.sh device/*/*.sh device/network/cdmx-network tests/host/*.sh

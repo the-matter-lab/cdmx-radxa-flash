@@ -18,9 +18,8 @@ Los participantes trabajan en dos repositorios separados:
 Abra **[cdmx-radxaflash.mantilla.ca](https://cdmx-radxaflash.mantilla.ca)**:
 
 1. Inserte una tarjeta SD de al menos 8 GB.
-2. En macOS, copie de la web la línea para Terminal, péguela y escriba la
-   contraseña de la Mac cuando `sudo` la solicite. En Windows, ejecute
-   `CDMX-Radxa-Flasher.exe` como administrador.
+2. Elija macOS, Windows o Linux en la web y copie el comando. Péguelo en
+   Terminal o en PowerShell como administrador.
 3. Seleccione la unidad extraíble y `equipo0`–`equipo9` o `admin`.
 4. Confirme el borrado y espere a que la escritura **y la lectura de
    verificación** lleguen a 100%.
@@ -31,16 +30,23 @@ USB/SD extraíbles, vuelve a comprobar el destino antes de borrarlo y descarga l
 versión indicada en [`site/manifest.json`](site/manifest.json). La imagen y su
 SHA‑512 se guardan en caché para las tarjetas siguientes.
 
-En macOS, la línea descarga un snapshot de código fuente fijado por commit,
-comprueba su SHA‑256 y lo ejecuta con Python local. Así evita el bloqueo de
-Gatekeeper para aplicaciones sin firma. La contraseña solo autoriza acceso al
-disco extraíble: no se guarda ni se escribe en la Radxa.
+Los tres comandos descargan un snapshot de código fuente fijado por commit,
+comprueban su SHA‑256 y lo ejecutan con Python local. En macOS esto evita el
+bloqueo de Gatekeeper para aplicaciones sin firma. La contraseña solo autoriza
+acceso al disco extraíble: no se guarda ni se escribe en la Radxa.
 
-### Ejecutar desde el código fuente en macOS
+### Ejecutar desde el código fuente
 
 ```bash
+# macOS
 /bin/bash -c "$(curl -fsSL https://cdmx-radxaflash.mantilla.ca/start-macos.sh)"
+
+# Linux
+/bin/bash -c "$(curl -fsSL https://cdmx-radxaflash.mantilla.ca/start-linux.sh)"
 ```
+
+En Windows, abra PowerShell como administrador y copie el comando que muestra
+la web. Los enlaces “Ver script” permiten inspeccionar los tres lanzadores.
 
 El lanzador crea un entorno Python local, instala el escritor FAT fijado y pide
 una sola autorización de administrador. También se puede usar la línea de
