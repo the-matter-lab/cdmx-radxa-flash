@@ -1,21 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openbox_menu xmlns="http://openbox.org/3.4/menu">
   <menu id="desktop-menu" label="Workspaces">
-    <item label="WORK — code"><action name="GoToDesktop"><to>1</to></action></item>
-    <item label="AGENT — Pi / PicoClaw"><action name="GoToDesktop"><to>2</to></action></item>
-    <item label="RUN — experiments"><action name="GoToDesktop"><to>3</to></action></item>
-  </menu>
-
-  <menu id="code-menu" label="Get workshop code">
-    <item label="BayesOpt only">
-      <action name="Execute"><command>/opt/cdmx-radxa-flash/device/desktop/open-workshop-repos.sh bayesopt</command></action>
-    </item>
-    <item label="Local AI only">
-      <action name="Execute"><command>/opt/cdmx-radxa-flash/device/desktop/open-workshop-repos.sh local-ai</command></action>
-    </item>
-    <item label="Both repositories">
-      <action name="Execute"><command>/opt/cdmx-radxa-flash/device/desktop/open-workshop-repos.sh all</command></action>
-    </item>
+    <item label="AGENTS — Pi / PicoClaw"><action name="GoToDesktop"><to>1</to></action></item>
+    <item label="BAYES — experiments"><action name="GoToDesktop"><to>2</to></action></item>
   </menu>
 
   <menu id="agent-menu" label="Agent tools">
@@ -38,7 +25,6 @@
     <item label="Code editor">
       <action name="Execute"><command>/opt/cdmx-radxa-flash/device/desktop/open-editor.sh</command></action>
     </item>
-    <menu id="code-menu"/>
     <menu id="agent-menu"/>
     <item label="System monitor">
       <action name="Execute"><command>/opt/cdmx-radxa-flash/device/desktop/open-monitor.sh</command></action>

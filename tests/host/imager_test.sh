@@ -111,8 +111,12 @@ assert_eq '    "/images/$(basename "$output_raw")" /source.tar /instructor.pub' 
   'container receives the isolated raw image path'
 assert_eq 2 "$(grep -c '<menu>root-menu</menu>' "$ROOT/device/desktop/openbox.xml")" \
   'desktop launcher is available from the keyboard and right-click'
-assert_eq 3 "$(sed -n 's:.*<number>\([0-9][0-9]*\)</number>.*:\1:p' "$ROOT/device/desktop/openbox.xml")" \
-  'desktop provides WORK, AGENT, and RUN workspaces'
+assert_eq 2 "$(sed -n 's:.*<number>\([0-9][0-9]*\)</number>.*:\1:p' "$ROOT/device/desktop/openbox.xml")" \
+  'desktop provides exactly two workspaces'
+assert_eq 1 "$(grep -c '<name>AGENTS</name>' "$ROOT/device/desktop/openbox.xml")" \
+  'first workspace is named AGENTS'
+assert_eq 1 "$(grep -c '<name>BAYES</name>' "$ROOT/device/desktop/openbox.xml")" \
+  'second workspace is named BAYES'
 assert_eq 1 "$(grep -c '<mousebind button="Left" action="Drag"><action name="Move"/></mousebind>' "$ROOT/device/desktop/openbox.xml")" \
   'window title bars can be dragged normally'
 assert_eq 1 "$(grep -c '<keybind key="A-Tab">' "$ROOT/device/desktop/openbox.xml")" \
@@ -121,12 +125,12 @@ assert_eq 1 "$(grep -c '<keybind key="C-A-t">' "$ROOT/device/desktop/openbox.xml
   'desktop has a new-terminal shortcut'
 assert_eq 1 "$(grep -c '<item label="Code editor">' "$ROOT/device/desktop/menu.xml")" \
   'desktop menu includes a graphical code editor'
-assert_eq 1 "$(grep -c '<menu id="code-menu" label="Get workshop code">' "$ROOT/device/desktop/menu.xml")" \
-  'desktop menu exposes repository download choices'
-assert_eq 2 "$(grep -c '^ *update_repo cdmx-bayesopt https://github.com/the-matter-lab/cdmx-bayesopt.git$' "$ROOT/device/desktop/fetch-workshop-repos.sh")" \
-  'repository downloader includes BayesOpt'
-assert_eq 2 "$(grep -c '^ *update_repo cdmx-local-ai https://github.com/the-matter-lab/cdmx-local-ai.git$' "$ROOT/device/desktop/fetch-workshop-repos.sh")" \
-  'repository downloader includes Local AI'
+assert_eq 0 "$(grep -c 'Get workshop code\|Get code' "$ROOT/device/desktop/menu.xml" || true)" \
+  'desktop menu has no code-download button'
+assert_eq 1 "$(grep -c 'https://github.com/the-matter-lab/cdmx-bayesopt.git' "$ROOT/device/desktop/get-bayesopt-code")" \
+  'workspace BayesOpt script downloads only BayesOpt'
+assert_eq 1 "$(grep -c 'https://github.com/the-matter-lab/cdmx-local-ai.git' "$ROOT/device/desktop/get-localai-code")" \
+  'workspace Local AI script downloads only Local AI'
 assert_eq 'panel_position = bottom center horizontal' \
   "$(grep '^panel_position = ' "$ROOT/device/desktop/tint2rc")" \
   'desktop panel stays at the bottom'
@@ -136,12 +140,17 @@ assert_eq 0 "$(grep -Ec "open-terminal|open-monitor|xterm -title 'System Status'
   'desktop does not pre-open RAM-heavy applications'
 assert_eq 1 "$(grep -c 'execp_command = printf '\'' APPS '\''' "$ROOT/device/desktop/tint2rc")" \
   'bottom panel has a persistent applications launcher'
-assert_eq 1 "$(grep -c 'execp_command = printf '\'' Get code '\''' "$ROOT/device/desktop/tint2rc")" \
-  'bottom panel has an obvious repository launcher'
+assert_eq 0 "$(grep -c 'Get code' "$ROOT/device/desktop/tint2rc" || true)" \
+  'bottom panel has no Get code launcher'
+assert_eq 'time1_timezone = :America/Mexico_City' \
+  "$(grep '^time1_timezone = ' "$ROOT/device/desktop/tint2rc")" \
+  'bottom clock always displays Mexico City time'
+assert_eq 1 "$(grep -c 'workshop_timezone=America/Mexico_City' "$ROOT/device/install.sh")" \
+  'image system timezone is Mexico City'
 assert_eq 1 "$(grep -c 'ln -sfn /var/lib/cdmx-picoclaw/workspace "\$home_workspace"' "$ROOT/device/install.sh")" \
   'participants receive the simple ~/workspace path'
-assert_eq 1 "$(grep -c 'cdmx-get-bayesopt' "$ROOT/device/desktop/fetch-workshop-repos.sh")" \
-  'BayesOpt has a dedicated download command'
+assert_eq 2 "$(grep -c '/var/lib/cdmx-picoclaw/workspace/get-.*-code' "$ROOT/device/install.sh")" \
+  'both download scripts are preinstalled in the visible workspace'
 old_org=aspuru-guzik'-group'
 if grep -Rqs --exclude-dir=.git --exclude-dir=image "$old_org" "$ROOT"; then
   printf 'not ok - old workshop GitHub organization remains in tracked source\n'

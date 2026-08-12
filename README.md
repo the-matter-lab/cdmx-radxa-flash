@@ -67,8 +67,9 @@ comandos existente con `host/flash-team.sh`.
 ## Qué contiene la imagen
 
 - RadxaOS Debian 12 Bookworm arm64 para ZERO 3, versión fijada `rsdk-b1`.
-- Escritorio Openbox ligero de 1280×720 con panel inferior persistente, tres
-  espacios de trabajo, terminal, Geany, monitor y fondo de Matter Lab.
+- Escritorio Openbox ligero de 1280×720 con panel inferior persistente, reloj
+  de Ciudad de México, dos espacios `AGENTS`/`BAYES`, terminal, Geany, monitor
+  y fondo de Matter Lab.
 - noVNC compartido: control en `control.html` y observación en `view.html`.
 - Portal cautivo para introducir el Wi‑Fi del recinto sin teclado.
 - SSH mediante clave pública, `sudo` local sin contraseña y servicios systemd
@@ -78,9 +79,9 @@ comandos existente con `host/flash-team.sh`.
 - Una versión exacta de `cdmx-local-ai`, fijada en
   [`image/cdmx-local-ai.env`](image/cdmx-local-ai.env); el código del agente no
   se duplica aquí.
-- Un lanzador que clona o actualiza `cdmx-local-ai` y `cdmx-bayesopt` cuando el
-  participante lo elige. Los repositorios de ejercicios no se clonan de
-  antemano.
+- Dos scripts visibles en `~/workspace`, `get-localai-code` y
+  `get-bayesopt-code`, que clonan o actualizan solamente el repositorio elegido.
+  Los repositorios de ejercicios no se clonan de antemano.
 - Ruta sencilla `~/workspace`, botones para reabrir aplicaciones y límites de
   memoria distintos para los equipos de 1 GB y la placa admin de 2 GB.
 

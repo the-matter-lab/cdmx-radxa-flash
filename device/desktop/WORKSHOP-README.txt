@@ -4,26 +4,35 @@ INICIO RAPIDO
 
 La barra inferior siempre permanece disponible:
 
-  APPS       todas las aplicaciones y ventanas abiertas
+  APPS       aplicaciones y ventanas abiertas
   Terminal   terminal nueva dentro de ~/workspace
   Code       editor grafico
-  Get code   descarga o actualiza los dos repositorios
   Agent      abre Pi Agent
   Monitor    CPU, memoria y procesos
 
-WORK, AGENT y RUN son tres escritorios. Las ventanas abiertas aparecen como
-botones en la barra inferior: haga clic para ocultarlas o restaurarlas. Si
-cierra una ventana con X, vuelva a abrirla desde la misma barra o desde APPS.
+AGENTS y BAYES son los dos escritorios. Cada ventana abierta aparece como un
+boton en la barra inferior; haga clic para ocultarla o restaurarla.
 
-El codigo del equipo siempre esta en:
+El codigo del equipo vive en ~/workspace. Para descargarlo desde Terminal:
 
-  ~/workspace
+  ./get-bayesopt-code
+  ./get-localai-code
 
-Descarga rapida desde Terminal:
+No necesita una cuenta de GitHub. El script actualiza un clon existente sin
+sobrescribir otros archivos.
 
-  cdmx-get-bayesopt       solo cdmx-bayesopt
-  cdmx-get-local-ai       solo cdmx-local-ai
-  cdmx-get-workshop-repos ambos repositorios
+FLUJO BAYESOPT
+
+  ./get-bayesopt-code
+  cd cdmx-bayesopt
+  ./scripts/install-color-lab.sh
+
+Abra http://equipoN.local:8010/ para controlar el LED y ver el sensor. Luego
+edite examples/hardware_objective.py y ejecute:
+
+  ./scripts/run-color-campaign.sh
+
+Abra http://equipoN.local:8000/ para seguir la campana.
 
 CABLEADO
 
@@ -32,24 +41,25 @@ NeoPixel: DIN=pin 19, GND=pin 20, 5V separado=pin 2.
 
 QUICK START
 
-The bottom panel always remains available:
+The persistent bottom panel contains APPS, Terminal, Code, Agent, and Monitor.
+AGENTS and BAYES are the two desktops. Open windows also appear in the panel;
+click their buttons to hide or restore them.
 
-  APPS       all applications and currently open windows
-  Terminal   a new terminal inside ~/workspace
-  Code       graphical editor
-  Get code   download or update both repositories
-  Agent      open Pi Agent
-  Monitor    CPU, memory, and processes
+Team code lives in ~/workspace. Download it from Terminal without a GitHub
+account:
 
-WORK, AGENT, and RUN are three desktops. Every open window appears as a button
-in the bottom panel; click it to hide or restore the window. If you close a
-window with X, reopen it from the same panel or APPS.
+  ./get-bayesopt-code
+  ./get-localai-code
 
-Team code always lives in ~/workspace. Terminal download commands:
+BAYESOPT FLOW
 
-  cdmx-get-bayesopt
-  cdmx-get-local-ai
-  cdmx-get-workshop-repos
+  ./get-bayesopt-code
+  cd cdmx-bayesopt
+  ./scripts/install-color-lab.sh
+
+Open http://equipoN.local:8010/ for LED control and sensor readings. Edit
+examples/hardware_objective.py, run ./scripts/run-color-campaign.sh, and open
+http://equipoN.local:8000/ to follow the campaign.
 
 WIRING
 

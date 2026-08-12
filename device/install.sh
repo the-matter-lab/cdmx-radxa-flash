@@ -8,6 +8,7 @@ install_agents=true
 enable_usb_ncm=false
 offline_image=false
 workshop_user=cdmx
+workshop_timezone=America/Mexico_City
 authorized_key_file=""
 # shellcheck source=image/cdmx-local-ai.env
 source "$repo_root/image/cdmx-local-ai.env"
@@ -88,8 +89,11 @@ apt-get install -y --no-install-recommends \
     network-manager novnc openbox openssh-server python3 python3-matplotlib \
     python3-numpy python3-pil python3-pip python3-smbus python3-spidev \
     python3-venv rfkill sudo tigervnc-standalone-server \
-    tint2 tmux ufw unattended-upgrades websockify x11-xserver-utils xauth xdotool xterm \
+    tint2 tmux tzdata ufw unattended-upgrades websockify x11-xserver-utils xauth xdotool xterm \
     zram-tools
+
+ln -sfn "/usr/share/zoneinfo/$workshop_timezone" /etc/localtime
+printf '%s\n' "$workshop_timezone" > /etc/timezone
 
 if ! id "$workshop_user" >/dev/null 2>&1; then
     adduser --disabled-password --gecos 'CDMX workshop team' "$workshop_user"
@@ -260,15 +264,21 @@ if [[ $(readlink -f "$repo_root") != /opt/cdmx-radxa-flash ]]; then
     tar -C "$repo_root" --exclude=.git --exclude=artifacts --exclude='*.img' --exclude='*.img.xz' -cf - . |
         tar -C /opt/cdmx-radxa-flash -xf -
 fi
+rm -f /opt/cdmx-radxa-flash/device/desktop/fetch-workshop-repos.sh \
+    /opt/cdmx-radxa-flash/device/desktop/open-workshop-repos.sh
 chown -R root:root /opt/cdmx-radxa-flash
 find /opt/cdmx-radxa-flash/device /opt/cdmx-radxa-flash/host -type f -name '*.sh' -exec chmod 0755 {} +
 chmod 0755 /opt/cdmx-radxa-flash/device/network/cdmx-network \
     /opt/cdmx-radxa-flash/device/network/network_portal.py
 
-install -m 0755 /opt/cdmx-radxa-flash/device/desktop/fetch-workshop-repos.sh \
-    /usr/local/bin/cdmx-get-workshop-repos
-ln -sfn cdmx-get-workshop-repos /usr/local/bin/cdmx-get-bayesopt
-ln -sfn cdmx-get-workshop-repos /usr/local/bin/cdmx-get-local-ai
+rm -f /usr/local/bin/cdmx-get-workshop-repos /usr/local/bin/cdmx-get-bayesopt \
+    /usr/local/bin/cdmx-get-local-ai
+install -m 0755 -o "$workshop_user" -g cdmx-workspace \
+    /opt/cdmx-radxa-flash/device/desktop/get-bayesopt-code \
+    /var/lib/cdmx-picoclaw/workspace/get-bayesopt-code
+install -m 0755 -o "$workshop_user" -g cdmx-workspace \
+    /opt/cdmx-radxa-flash/device/desktop/get-localai-code \
+    /var/lib/cdmx-picoclaw/workspace/get-localai-code
 install -m 0644 -o "$workshop_user" -g "$workshop_user" \
     /opt/cdmx-radxa-flash/device/desktop/WORKSHOP-README.txt \
     "/home/$workshop_user/WORKSHOP-README.txt"

@@ -13,23 +13,35 @@ Sustituya `N` por el número de su equipo.
    funciona para las cinco personas autorizadas por el instructor.
 
 El escritorio noVNC tiene una sola barra inferior. Sus botones `APPS`,
-`Terminal`, `Code`, `Get code`, `Agent` y `Monitor` permanecen visibles aunque
-cierre una aplicación. Cada ventana abierta aparece también en esa barra:
-haga clic en su botón para ocultarla o restaurarla. Si la cierra con X, pulse
-otra vez su lanzador. `WORK`, `AGENT` y `RUN` cambian entre los tres escritorios.
+`Terminal`, `Code`, `Agent` y `Monitor` permanecen visibles aunque cierre una
+aplicación. Cada ventana abierta aparece también en esa barra: haga clic en su
+botón para ocultarla o restaurarla. `AGENTS` y `BAYES` cambian entre los dos
+escritorios. El reloj usa la hora de Ciudad de México.
 
-Pulse `Get code` para descargar o actualizar automáticamente `cdmx-bayesopt` y
-`cdmx-local-ai`. También puede descargarlos por separado desde `APPS` o desde
-una terminal:
+Abra `Terminal`; ya comienza dentro de `~/workspace`. Descargue solamente el
+repositorio que necesite con uno de los dos scripts visibles ahí:
 
 ```bash
-cdmx-get-bayesopt
-cdmx-get-local-ai
-cdmx-get-workshop-repos
+./get-bayesopt-code
+./get-localai-code
 ```
 
-No necesita una cuenta de GitHub. El lanzador nunca sobrescribe una carpeta
-que no sea un repositorio Git.
+No necesita una cuenta de GitHub. Cada script actualiza un clon existente y no
+sobrescribe una carpeta que no sea un repositorio Git.
+
+Para el laboratorio BayesOpt:
+
+```bash
+./get-bayesopt-code
+cd cdmx-bayesopt
+./scripts/install-color-lab.sh
+```
+
+Abra `http://equipoN.local:8010/` para cambiar el NeoPixel y ver las curvas del
+sensor. Abra `examples/hardware_objective.py` con `Code`, modifique las pocas
+constantes marcadas y ejecute `./scripts/run-color-campaign.sh`. El avance se
+muestra en `http://equipoN.local:8000/` mientras la página del puerto 8010 sigue
+mostrando el experimento físico.
 
 Otros medios de acceso:
 
