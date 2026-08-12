@@ -67,8 +67,9 @@ and asks for one administrator authorization. The existing
 ## Image contents
 
 - Pinned RadxaOS Debian 12 Bookworm arm64 for ZERO 3, release `rsdk-b1`.
-- Lightweight 1280×720 Openbox desktop with a persistent bottom panel, three
-  workspaces, terminal, Geany, monitor, and Matter Lab wallpaper.
+- Lightweight 1280×720 Openbox desktop with a persistent bottom panel, Mexico
+  City clock, two `AGENTS`/`BAYES` workspaces, terminal, Geany, monitor, and
+  Matter Lab wallpaper.
 - Shared noVNC desktop: control through `control.html`, observation through
   `view.html`.
 - Captive Wi-Fi portal for keyboard-free venue onboarding.
@@ -79,8 +80,9 @@ and asks for one administrator authorization. The existing
 - An exact `cdmx-local-ai` version pinned in
   [`image/cdmx-local-ai.env`](image/cdmx-local-ai.env); agent code is not
   duplicated here.
-- A launcher that clones or updates `cdmx-local-ai` and `cdmx-bayesopt` when a
-  participant chooses it. Exercise repositories are not pre-cloned.
+- Two visible scripts in `~/workspace`, `get-localai-code` and
+  `get-bayesopt-code`, clone or update only the selected repository. Exercise
+  repositories are not pre-cloned.
 - Simple `~/workspace` path, persistent buttons for reopening apps, and
   separate memory ceilings for 1 GB team boards and the 2 GB admin board.
 

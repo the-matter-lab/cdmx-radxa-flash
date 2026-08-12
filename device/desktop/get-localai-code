@@ -1,0 +1,9 @@
+#!/bin/bash
+set -euo pipefail
+
+cd -- "$(dirname -- "$0")"
+if [[ -d cdmx-local-ai/.git ]]; then
+    git -C cdmx-local-ai pull --ff-only
+else
+    git clone https://github.com/the-matter-lab/cdmx-local-ai.git cdmx-local-ai
+fi
