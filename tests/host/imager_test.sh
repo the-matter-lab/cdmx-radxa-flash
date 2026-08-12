@@ -179,6 +179,8 @@ assert_eq 1 "$(grep -c '^legacy_i2c=/boot/dtbo/rk3568-i2c4-m0.dtbo$' "$ROOT/devi
   'legacy I2C4 mapping is explicitly disabled'
 assert_eq 1 "$(grep -c 'i2c-gpio-cdmx {' "$ROOT/device/overlays/cdmx-zero3w-i2c-gpio.dts")" \
   'software I2C adapter has a stable discoverable name'
+assert_eq 1 "$(grep -c '^[[:space:]]*cdmx-i2c-gpio {$' "$ROOT/device/overlays/cdmx-zero3w-i2c-gpio.dts")" \
+  'Rockchip pinctrl pins are nested inside a function group'
 assert_eq 1 "$(grep -c 'sda-gpios = <&gpio0 24 6>;' "$ROOT/device/overlays/cdmx-zero3w-i2c-gpio.dts")" \
   'physical pin 10 is open-drain GPIO0_D0 SDA'
 assert_eq 1 "$(grep -c 'scl-gpios = <&gpio0 25 6>;' "$ROOT/device/overlays/cdmx-zero3w-i2c-gpio.dts")" \
