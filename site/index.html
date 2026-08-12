@@ -23,7 +23,28 @@ footer{display:flex;justify-content:space-between;gap:16px;margin-top:24px;color
 
   <section class="intro">
     <h1>Grabar una SD.</h1>
-    <p>Inserta la tarjeta, elige el equipo y presiona grabar.</p>
+    <p>Inicia el lector local, inserta la tarjeta, elige el equipo y presiona grabar.</p>
+  </section>
+
+  <section class="panel offline" id="offline">
+    <div class="row"><span class="label">Lector local</span><span class="status" id="helperStatus">Sin iniciar</span></div>
+    <div class="platforms" id="platforms" role="group" aria-label="Sistema operativo">
+      <button class="platform" data-platform="macos" type="button">macOS</button>
+      <button class="platform" data-platform="windows" type="button">Windows</button>
+      <button class="platform" data-platform="linux" type="button">Linux</button>
+    </div>
+    <p class="platformHint" id="platformHint">Terminal · pega y presiona Enter.</p>
+    <div class="terminal">
+      <code id="terminalCommand">/bin/bash -c "$(curl -fsSL https://cdmx-radxaflash.mantilla.ca/start-macos.sh)"</code>
+      <button class="copyIcon" id="copyCommand" type="button" aria-label="Copiar comando" title="Copiar comando">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+      </button>
+    </div>
+    <div class="offlineFoot">
+      <a class="scriptLink" id="scriptLink" href="start-macos.sh">Ver script para macOS</a>
+      <button class="textButton" id="uninstallMode" type="button">Desinstalar</button>
+      <button class="textButton retry" id="retry" type="button">Reintentar</button>
+    </div>
   </section>
 
   <section class="panel" id="devicePanel">
@@ -46,27 +67,6 @@ footer{display:flex;justify-content:space-between;gap:16px;margin-top:24px;color
     <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress"><div class="fill" id="fill"></div></div>
     <p class="error" id="error" hidden></p>
     <p class="hint" id="lastLog">La imagen se descarga y verifica automáticamente.</p>
-  </section>
-
-  <section class="panel offline" id="offline">
-    <div class="row"><span class="label">Lector local</span><span class="status" id="helperStatus">Sin iniciar</span></div>
-    <div class="platforms" id="platforms" role="group" aria-label="Sistema operativo">
-      <button class="platform" data-platform="macos" type="button">macOS</button>
-      <button class="platform" data-platform="windows" type="button">Windows</button>
-      <button class="platform" data-platform="linux" type="button">Linux</button>
-    </div>
-    <p class="platformHint" id="platformHint">Terminal · pega y presiona Enter.</p>
-    <div class="terminal">
-      <code id="terminalCommand">/bin/bash -c "$(curl -fsSL https://cdmx-radxaflash.mantilla.ca/start-macos.sh)"</code>
-      <button class="copyIcon" id="copyCommand" type="button" aria-label="Copiar comando" title="Copiar comando">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
-      </button>
-    </div>
-    <div class="offlineFoot">
-      <a class="scriptLink" id="scriptLink" href="start-macos.sh">Ver script para macOS</a>
-      <button class="textButton" id="uninstallMode" type="button">Desinstalar</button>
-      <button class="textButton retry" id="retry" type="button">Reintentar</button>
-    </div>
   </section>
 
   <footer>

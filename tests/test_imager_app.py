@@ -248,6 +248,8 @@ class ImagerTests(unittest.TestCase):
 
     def test_ui_has_all_teams_and_progress_semantics(self):
         public_html = (MODULE_PATH.parents[1] / "site" / "index.html").read_text(encoding="utf-8")
+        self.assertLess(public_html.index('id="offline"'), public_html.index('id="devicePanel"'))
+        self.assertIn("Inicia el lector local, inserta la tarjeta", public_html)
         self.assertIn("role=\"progressbar\"", public_html)
         self.assertIn("'admin'", public_html)
         self.assertIn("http://127.0.0.1:8766", public_html)
