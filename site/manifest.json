@@ -1,21 +1,21 @@
 {
   "schema": 1,
-  "version": "2026-08-12.2",
-  "published_at": "2026-08-12T15:13:18Z",
+  "version": "2026-08-12.3",
+  "published_at": "2026-08-12T23:46:18Z",
   "source": "https://github.com/the-matter-lab/cdmx-radxa-flash",
-  "docker": "bestquark/cdmx-radxa-zero3w:2026-08-12.2",
+  "docker": "bestquark/cdmx-radxa-zero3w:2026-08-12.3",
   "image": {
     "filename": "cdmx-workshop-golden.img.xz",
-    "url": "https://cdmx-radxaflash.mantilla.ca/downloads/cdmx-workshop-golden-2026-08-12.2.img.xz",
-    "sha512": "ee53caf308f4d3949981c0129773247e146463ecc673aaef75903065536b6abcaa5d1b951586a0cc2cb5cda368d38534eb764396e6e7b7ba869e271edb2702a7",
-    "compressed_bytes": 1908043732,
+    "url": "https://cdmx-radxaflash.mantilla.ca/downloads/cdmx-workshop-golden-2026-08-12.3.img.xz",
+    "sha512": "95072a03c466bdb2c9aa80499c3bae2f8fdfc47064a1eae3c161f05060ebef94ecf5904c29fb14b8d33f321e32c2045bed8c0057a91bd41fb3ea5018d6ce50ba",
+    "compressed_bytes": 1913395144,
     "uncompressed_bytes": 8074662912
   },
   "simulator": {
     "url": "https://radxa-simulator.mantilla.ca",
     "source_commit": "c75070da318021b0889c00924c824dfeba4a306e",
     "bayesopt_source": "https://github.com/the-matter-lab/cdmx-bayesopt",
-    "bayesopt_commit": "2932febb16af89a465d4e7903d4eb0268489c045"
+    "bayesopt_commit": "f63a0ad9eaddcf54274dd4a01fbde63c40b6854a"
   },
   "launchers": {
     "macos_terminal": "https://cdmx-radxaflash.mantilla.ca/start-macos.sh",
