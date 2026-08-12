@@ -57,7 +57,8 @@ and asks for one administrator authorization. The existing
 - Captive Wi-Fi portal for keyboard-free venue onboarding.
 - Public-key SSH, passwordless local `sudo`, and systemd services that recover
   after normal power cycles.
-- Python dependencies and I2C4-M0/SPI3-M1 overlays for the color lab.
+- Python dependencies, GPIO-backed I²C on physical pins 8/10, and SPI3-M1 for
+  the color lab. The custom overlay disables FIQ/UART2 on those pins.
 - An exact `cdmx-local-ai` version pinned in
   [`image/cdmx-local-ai.env`](image/cdmx-local-ai.env); agent code is not
   duplicated here.
@@ -66,6 +67,9 @@ and asks for one administrator authorization. The existing
 
 Samba is not part of the workshop cards. The image removes KDE, local browsers,
 and Samba packages to conserve storage and RAM on the 1 GB boards.
+
+Wiring baked into the image: TCS34725 `VCC→4`, `GND→6`, `SCL→8`, `SDA→10`;
+NeoPixel `DIN→19`, `GND→20`, with separate 5 V power from pin 2.
 
 ## Workshop-day network and access
 

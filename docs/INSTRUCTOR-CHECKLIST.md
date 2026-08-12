@@ -66,6 +66,8 @@ tarjeta. Nunca las agregue a la imagen local ni al repositorio.
 ```bash
 sudo cdmx-network status
 sudo cdmx-network reset
+i2cdetect -l | grep i2c-gpio-cdmx
+ls -l /dev/spidev3.0
 sudo systemctl restart cdmx-desktop cdmx-novnc
 sudo systemctl restart cdmx-picoclaw
 sudo journalctl -u cdmx-network -u cdmx-network-monitor -u cdmx-picoclaw -n 100 --no-pager

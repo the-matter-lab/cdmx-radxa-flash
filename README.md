@@ -56,7 +56,8 @@ comandos existente con `host/flash-team.sh`.
 - Portal cautivo para introducir el Wi‑Fi del recinto sin teclado.
 - SSH mediante clave pública, `sudo` local sin contraseña y servicios systemd
   que vuelven a iniciar después de un ciclo normal de energía.
-- Dependencias Python y overlays I2C4-M0/SPI3-M1 para el laboratorio de color.
+- Dependencias Python, I²C por GPIO en los pines físicos 8/10 y SPI3-M1 para el
+  laboratorio de color. El overlay propio desactiva FIQ/UART2 en esos pines.
 - Una versión exacta de `cdmx-local-ai`, fijada en
   [`image/cdmx-local-ai.env`](image/cdmx-local-ai.env); el código del agente no
   se duplica aquí.
@@ -67,6 +68,9 @@ comandos existente con `host/flash-team.sh`.
 Samba no forma parte de las tarjetas del taller. La imagen elimina KDE,
 navegadores locales y paquetes Samba para reducir almacenamiento y RAM en las
 placas de 1 GB.
+
+Cableado fijado en la imagen: TCS34725 `VCC→4`, `GND→6`, `SCL→8`, `SDA→10`;
+NeoPixel `DIN→19`, `GND→20` y alimentación de 5 V separada desde el pin 2.
 
 ## Red y acceso el día del taller
 

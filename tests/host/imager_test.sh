@@ -140,8 +140,29 @@ fi
 assert_eq '$workshop_user ALL=(ALL:ALL) NOPASSWD: ALL' \
   "$(grep '^\$workshop_user ALL=(ALL:ALL) NOPASSWD: ALL$' "$ROOT/device/install.sh")" \
   'workshop user can install tools without a nonexistent password'
-assert_eq 1 "$(grep -c 'rk3568-i2c4-m0.dtbo rk3568-spi3-m1-cs0-spidev.dtbo' "$ROOT/device/install.sh")" \
-  'color-lab hardware overlays are enabled in the image'
+assert_eq 1 "$(grep -c '^overlay=rk3568-spi3-m1-cs0-spidev.dtbo$' "$ROOT/device/install.sh")" \
+  'NeoPixel SPI3 overlay is enabled in the image'
+assert_eq 1 "$(grep -c 'cdmx-zero3w-i2c-gpio.dtbo' "$ROOT/device/install.sh")" \
+  'custom color-sensor I2C overlay is compiled into the image'
+assert_eq 1 "$(grep -c '^legacy_i2c=/boot/dtbo/rk3568-i2c4-m0.dtbo$' "$ROOT/device/install.sh")" \
+  'legacy I2C4 mapping is explicitly disabled'
+assert_eq 1 "$(grep -c 'i2c-gpio-cdmx {' "$ROOT/device/overlays/cdmx-zero3w-i2c-gpio.dts")" \
+  'software I2C adapter has a stable discoverable name'
+assert_eq 1 "$(grep -c 'sda-gpios = <&gpio0 24 6>;' "$ROOT/device/overlays/cdmx-zero3w-i2c-gpio.dts")" \
+  'physical pin 10 is open-drain GPIO0_D0 SDA'
+assert_eq 1 "$(grep -c 'scl-gpios = <&gpio0 25 6>;' "$ROOT/device/overlays/cdmx-zero3w-i2c-gpio.dts")" \
+  'physical pin 8 is open-drain GPIO0_D1 SCL'
+assert_eq 2 "$(grep -c 'status = "disabled";' "$ROOT/device/overlays/cdmx-zero3w-i2c-gpio.dts")" \
+  'custom I2C overlay disables FIQ debugger and UART2'
+assert_eq 2 "$(sed -n '/cdmx-color-lab.conf/,/^EOF$/p' "$ROOT/device/install.sh" | grep -c '^i2c-')" \
+  'software I2C kernel modules load at boot'
+if command -v dtc >/dev/null 2>&1; then
+  dtc -@ -I dts -O dtb -o "$tmp/cdmx-zero3w-i2c-gpio.dtbo" \
+    "$ROOT/device/overlays/cdmx-zero3w-i2c-gpio.dts"
+  printf 'ok - custom I2C overlay compiles\n'
+else
+  printf 'ok - custom I2C overlay compile skipped because dtc is unavailable\n'
+fi
 if ! grep -Eq 'python3-numpy python3-pil python3-pip python3-smbus python3-spidev' \
     "$ROOT/device/install.sh"; then
   printf 'not ok - color-lab Python dependencies are not preinstalled\n'

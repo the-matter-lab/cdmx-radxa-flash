@@ -16,6 +16,11 @@ Tambien puede abrir una terminal y ejecutar:
 Use la barra inferior para cambiar entre WORK, AGENT y RUN.
 Arrastre las ventanas desde la barra de titulo y cambie entre ellas con Alt+Tab.
 
+CABLEADO
+
+TCS34725: VCC=pin 4, GND=pin 6, SCL=pin 8, SDA=pin 10.
+NeoPixel: DIN=pin 19, GND=pin 20, 5V separado=pin 2.
+
 QUICK START
 
 1. Right-click the black desktop background.
@@ -24,3 +29,8 @@ QUICK START
 4. Find them in /var/lib/cdmx-picoclaw/workspace.
 
 You can also run cdmx-get-workshop-repos in a terminal.
+
+WIRING
+
+TCS34725: VCC=pin 4, GND=pin 6, SCL=pin 8, SDA=pin 10.
+NeoPixel: DIN=pin 19, GND=pin 20, separate 5V=pin 2.

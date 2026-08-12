@@ -80,7 +80,7 @@ if ! $skip_upgrade; then
     apt-get -y full-upgrade
 fi
 apt-get install -y --no-install-recommends \
-    avahi-daemon bash ca-certificates curl feh geany git i2c-tools jq locales nano \
+    avahi-daemon bash ca-certificates curl feh geany git device-tree-compiler i2c-tools jq locales nano \
     network-manager novnc openbox openssh-server python3 python3-matplotlib \
     python3-numpy python3-pil python3-pip python3-smbus python3-spidev \
     python3-venv rfkill sudo tigervnc-standalone-server \
@@ -107,14 +107,30 @@ else
     printf 'WARNING: no instructor SSH public key was installed; SSH login will remain unavailable.\n' >&2
 fi
 
-# The cdmx-bayesopt color lab uses the ZERO 3W header's I2C4-M0 bus and
-# SPI3-M1 CS0 device. RadxaOS ships these overlays disabled by filename;
-# enabling them here avoids an interactive rsetup/reboot step at the workshop.
-for overlay in rk3568-i2c4-m0.dtbo rk3568-spi3-m1-cs0-spidev.dtbo; do
-    if [[ -e /boot/dtbo/$overlay.disabled && ! -e /boot/dtbo/$overlay ]]; then
-        mv -- "/boot/dtbo/$overlay.disabled" "/boot/dtbo/$overlay"
-    fi
-done
+# The color sensor uses a workshop-specific software-I2C mapping because
+# physical pins 8/10 default to FIQ/UART2 on the ZERO 3W. The overlay disables
+# those consumers and creates i2c-gpio-cdmx (pin 8 SCL, pin 10 SDA). Keep the
+# legacy I2C4 overlay disabled so auto-detection cannot select the wrong pins.
+legacy_i2c=/boot/dtbo/rk3568-i2c4-m0.dtbo
+if [[ -e $legacy_i2c && ! -e $legacy_i2c.disabled ]]; then
+    mv -- "$legacy_i2c" "$legacy_i2c.disabled"
+fi
+install -d -m 0755 /boot/dtbo
+dtc -@ -I dts -O dtb \
+    -o /boot/dtbo/cdmx-zero3w-i2c-gpio.dtbo \
+    "$repo_root/device/overlays/cdmx-zero3w-i2c-gpio.dts"
+
+# The NeoPixel remains on SPI3-M1 MOSI (physical pin 19). RadxaOS ships the
+# SPI3 spidev overlay disabled by filename, so enable it without rsetup.
+overlay=rk3568-spi3-m1-cs0-spidev.dtbo
+if [[ -e /boot/dtbo/$overlay.disabled && ! -e /boot/dtbo/$overlay ]]; then
+    mv -- "/boot/dtbo/$overlay.disabled" "/boot/dtbo/$overlay"
+fi
+install -d -m 0755 /etc/modules-load.d
+cat > /etc/modules-load.d/cdmx-color-lab.conf <<'EOF'
+i2c-dev
+i2c-gpio
+EOF
 if command -v u-boot-update >/dev/null 2>&1; then
     u-boot-update
 fi
