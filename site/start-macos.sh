@@ -3,12 +3,15 @@ set -Eeuo pipefail
 
 # The hosted launcher intentionally installs a reviewed, immutable source
 # snapshot instead of asking macOS to trust an unsigned application bundle.
-SOURCE_COMMIT=9ba4ea0a9d18f1f25c36753a9c418b6a9db503a6
-ARCHIVE_SHA256=3b15ced6ce1b15591ab158ab791d119c30bce2a756e6fae58a547588789cc98e
+SOURCE_COMMIT=3ecbf3467f8fb5f140d89336b798ea17d47abbcd
+ARCHIVE_SHA256=65efe3a87175a1aab45e29b9ec2702bffa29de6ff8046b515cf5bc411e4fbee4
 ARCHIVE_URL="https://codeload.github.com/the-matter-lab/cdmx-radxa-flash/tar.gz/${SOURCE_COMMIT}"
 APP_DIR="${HOME}/Library/Application Support/CDMXRadxaFlash"
 SOURCE_DIR="${APP_DIR}/source-${SOURCE_COMMIT}"
 LAUNCHER="${SOURCE_DIR}/host/start-imager.command"
+PORT=${CDMX_IMAGER_PORT:-8766}
+PUBLIC_SITE=https://cdmx-radxaflash.mantilla.ca/
+PROCESS_PATTERN='CDMXRadxaFlash/source-[0-9a-f]+/host/imager_app\.py'
 WORK_DIR=
 
 die() {
@@ -55,6 +58,19 @@ fi
 cleanup
 WORK_DIR=
 trap - EXIT
+
+root_status=$(/usr/bin/curl --silent --output /dev/null --write-out '%{http_code}' "http://127.0.0.1:${PORT}/" || true)
+if [[ $root_status == 302 ]]; then
+  /usr/bin/open "$PUBLIC_SITE"
+  printf 'El lector ya está abierto.\n'
+  exit 0
+fi
+if /usr/bin/curl --fail --silent "http://127.0.0.1:${PORT}/api/state" >/dev/null 2>&1; then
+  printf 'Actualizando el lector anterior…\n'
+  sudo /usr/bin/pkill -TERM -f "$PROCESS_PATTERN" || true
+  /bin/sleep 1
+fi
+
 printf 'Abriendo el lector. macOS pedirá la contraseña de esta Mac una vez.\n'
 printf 'La contraseña no se guarda ni se escribe en la Radxa.\n\n'
 exec /bin/bash "$LAUNCHER"

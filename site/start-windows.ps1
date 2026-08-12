@@ -1,8 +1,8 @@
 #requires -Version 5.1
 $ErrorActionPreference = "Stop"
 
-$SourceCommit = "9ba4ea0a9d18f1f25c36753a9c418b6a9db503a6"
-$ArchiveSha256 = "3b15ced6ce1b15591ab158ab791d119c30bce2a756e6fae58a547588789cc98e"
+$SourceCommit = "3ecbf3467f8fb5f140d89336b798ea17d47abbcd"
+$ArchiveSha256 = "65efe3a87175a1aab45e29b9ec2702bffa29de6ff8046b515cf5bc411e4fbee4"
 $ArchiveUrl = "https://codeload.github.com/the-matter-lab/cdmx-radxa-flash/tar.gz/$SourceCommit"
 $PublicSite = "https://cdmx-radxaflash.mantilla.ca/"
 $AppDir = Join-Path $env:LOCALAPPDATA "CDMXRadxaFlash"
@@ -70,6 +70,28 @@ if (-not (Test-Path $VenvPython)) {
 }
 
 & $VenvPython -m pip install --disable-pip-version-check -q -r (Join-Path $SourceDir "host\requirements.txt")
+
+try {
+    $Existing = Invoke-WebRequest -UseBasicParsing -MaximumRedirection 0 -Uri "http://127.0.0.1:8766/" -ErrorAction Stop
+    if ($Existing.StatusCode -eq 302) {
+        Start-Process $PublicSite
+        Write-Host "El lector ya está abierto."
+        exit 0
+    }
+}
+catch {
+    try {
+        Invoke-RestMethod -UseBasicParsing -Uri "http://127.0.0.1:8766/api/state" -ErrorAction Stop | Out-Null
+        Write-Host "Actualizando el lector anterior…"
+        Get-CimInstance Win32_Process | Where-Object {
+            $_.Name -in @("python.exe", "pythonw.exe") -and
+            $_.CommandLine -like "*$AppDir*host\imager_app.py*"
+        } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+        Start-Sleep -Seconds 1
+    }
+    catch {}
+}
+
 Start-Process $PublicSite
 Write-Host "Mantén PowerShell abierto mientras grabas tarjetas.`n"
 & $VenvPython $Launcher --no-browser

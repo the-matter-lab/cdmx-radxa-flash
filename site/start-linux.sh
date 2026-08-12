@@ -1,8 +1,8 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-SOURCE_COMMIT=9ba4ea0a9d18f1f25c36753a9c418b6a9db503a6
-ARCHIVE_SHA256=3b15ced6ce1b15591ab158ab791d119c30bce2a756e6fae58a547588789cc98e
+SOURCE_COMMIT=3ecbf3467f8fb5f140d89336b798ea17d47abbcd
+ARCHIVE_SHA256=65efe3a87175a1aab45e29b9ec2702bffa29de6ff8046b515cf5bc411e4fbee4
 ARCHIVE_URL="https://codeload.github.com/the-matter-lab/cdmx-radxa-flash/tar.gz/${SOURCE_COMMIT}"
 APP_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/cdmx-radxa-flash"
 SOURCE_DIR="${APP_DIR}/source-${SOURCE_COMMIT}"
@@ -61,10 +61,16 @@ if [[ ! -x $VENV/bin/python ]]; then
 fi
 "$VENV/bin/python" -m pip install --disable-pip-version-check -q -r "$SOURCE_DIR/host/requirements.txt"
 
-if curl --fail --silent "http://127.0.0.1:${PORT}/api/state" >/dev/null 2>&1; then
+root_status=$(curl --silent --output /dev/null --write-out '%{http_code}' "http://127.0.0.1:${PORT}/" || true)
+if [[ $root_status == 302 ]]; then
   command -v xdg-open >/dev/null 2>&1 && xdg-open "$PUBLIC_SITE" >/dev/null 2>&1 || true
   printf 'El lector ya está abierto.\n'
   exit 0
+fi
+if curl --fail --silent "http://127.0.0.1:${PORT}/api/state" >/dev/null 2>&1; then
+  printf 'Actualizando el lector anterior…\n'
+  sudo pkill -TERM -f 'cdmx-radxa-flash/source-[0-9a-f]+/host/imager_app\.py' || true
+  sleep 1
 fi
 
 (
