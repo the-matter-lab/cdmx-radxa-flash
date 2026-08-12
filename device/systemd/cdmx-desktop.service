@@ -11,7 +11,7 @@ Group=cdmx
 Environment=CDMX_ROOT=/opt/cdmx-radxa-flash
 Environment=DISPLAY_NUMBER=1
 Environment=VNC_SECURITY_TYPES=None
-WorkingDirectory=/var/lib/cdmx-picoclaw/workspace
+WorkingDirectory=/home/cdmx/workspace
 ExecStart=/opt/cdmx-radxa-flash/device/desktop/start-session.sh
 Restart=on-failure
 RestartSec=3
@@ -22,7 +22,7 @@ PrivateDevices=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=read-only
-ReadWritePaths=/home/cdmx/.pi /var/lib/cdmx-picoclaw/workspace
+ReadWritePaths=/home/cdmx/.pi /home/cdmx/workspace /var/lib/cdmx-picoclaw/workspace
 ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectKernelLogs=true

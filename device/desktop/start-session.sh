@@ -32,7 +32,7 @@ if [ -z "$XVNC" ]; then
     echo "TigerVNC server not found (expected Xtigervnc or Xvnc)." >&2
     exit 69
 fi
-for command_name in feh mcookie xauth openbox tint2 xterm xsetroot; do
+for command_name in feh mcookie xauth openbox tint2 xdotool xterm xsetroot; do
     if ! command -v "$command_name" >/dev/null 2>&1; then
         echo "Required desktop command not found: $command_name" >&2
         exit 69
@@ -83,28 +83,9 @@ CHILDREN="$CHILDREN $!"
 
 xsetroot -solid '#000000'
 feh --no-fehbg --bg-fill "$ROOT/device/desktop/matter-lab-workshop-wallpaper.png"
-xterm -title 'System Status' -geometry 75x3+650+24 \
-    -fa Monospace -fs 9 -bg '#000000' -fg '#86efac' \
-    -e "$ROOT/device/desktop/system-status.sh" &
-CHILDREN="$CHILDREN $!"
 
-"$ROOT/device/desktop/open-terminal.sh" workspace &
-CHILDREN="$CHILDREN $!"
-
-xterm -title 'Pi Agent' -geometry 80x38+0+54 \
-    -fa Monospace -fs 10 -bg '#0b1020' -fg '#e5e7eb' \
-    -e "$ROOT/device/desktop/pi-terminal.sh" &
-CHILDREN="$CHILDREN $!"
-
-xterm -title 'Channel + Workspace' -geometry 80x38+640+54 \
-    -fa Monospace -fs 9 -bg '#0b1020' -fg '#bfdbfe' \
-    -e "$ROOT/device/desktop/code-viewer.sh" &
-CHILDREN="$CHILDREN $!"
-
-"$ROOT/device/desktop/open-terminal.sh" experiment &
-CHILDREN="$CHILDREN $!"
-
-"$ROOT/device/desktop/open-monitor.sh" &
-CHILDREN="$CHILDREN $!"
+# Start clean and light. The persistent bottom panel opens every application;
+# task buttons restore/minimize running windows, so closing one is harmless.
+# Avoiding six automatic xterms/top processes saves RAM on the 1 GB boards.
 
 wait "$XVNC_PID"

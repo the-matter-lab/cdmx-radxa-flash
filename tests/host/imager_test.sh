@@ -103,14 +103,29 @@ assert_eq 1 "$(grep -c '<keybind key="A-Tab">' "$ROOT/device/desktop/openbox.xml
   'Alt-Tab switches between open applications'
 assert_eq 1 "$(grep -c '<keybind key="C-A-t">' "$ROOT/device/desktop/openbox.xml")" \
   'desktop has a new-terminal shortcut'
-assert_eq 1 "$(grep -c 'Code Editor — Geany' "$ROOT/device/desktop/menu.xml")" \
+assert_eq 1 "$(grep -c '<item label="Code editor">' "$ROOT/device/desktop/menu.xml")" \
   'desktop menu includes a graphical code editor'
-assert_eq 1 "$(grep -c 'Download/update workshop code' "$ROOT/device/desktop/menu.xml")" \
-  'desktop menu includes the one-click repository downloader'
-assert_eq 2 "$(grep -c '^ *update_repo cdmx-' "$ROOT/device/desktop/fetch-workshop-repos.sh")" \
-  'repository downloader includes both workshop repositories'
-assert_eq 2 "$(grep -c 'https://github.com/the-matter-lab/cdmx-' "$ROOT/device/desktop/fetch-workshop-repos.sh")" \
-  'SD-card downloader uses the Matter Lab organization'
+assert_eq 1 "$(grep -c '<menu id="code-menu" label="Get workshop code">' "$ROOT/device/desktop/menu.xml")" \
+  'desktop menu exposes repository download choices'
+assert_eq 2 "$(grep -c '^ *update_repo cdmx-bayesopt https://github.com/the-matter-lab/cdmx-bayesopt.git$' "$ROOT/device/desktop/fetch-workshop-repos.sh")" \
+  'repository downloader includes BayesOpt'
+assert_eq 2 "$(grep -c '^ *update_repo cdmx-local-ai https://github.com/the-matter-lab/cdmx-local-ai.git$' "$ROOT/device/desktop/fetch-workshop-repos.sh")" \
+  'repository downloader includes Local AI'
+assert_eq 'panel_position = bottom center horizontal' \
+  "$(grep '^panel_position = ' "$ROOT/device/desktop/tint2rc")" \
+  'desktop panel stays at the bottom'
+assert_eq 0 "$(grep -c 'uptime\|/proc/uptime' "$ROOT/device/desktop/system-status.sh")" \
+  'compact status removes the elapsed-seconds counter'
+assert_eq 0 "$(grep -Ec "open-terminal|open-monitor|xterm -title 'System Status'|xterm -title 'Pi Agent'" "$ROOT/device/desktop/start-session.sh")" \
+  'desktop does not pre-open RAM-heavy applications'
+assert_eq 1 "$(grep -c 'execp_command = printf '\'' APPS '\''' "$ROOT/device/desktop/tint2rc")" \
+  'bottom panel has a persistent applications launcher'
+assert_eq 1 "$(grep -c 'execp_command = printf '\'' Get code '\''' "$ROOT/device/desktop/tint2rc")" \
+  'bottom panel has an obvious repository launcher'
+assert_eq 1 "$(grep -c 'ln -sfn /var/lib/cdmx-picoclaw/workspace "\$home_workspace"' "$ROOT/device/install.sh")" \
+  'participants receive the simple ~/workspace path'
+assert_eq 1 "$(grep -c 'cdmx-get-bayesopt' "$ROOT/device/desktop/fetch-workshop-repos.sh")" \
+  'BayesOpt has a dedicated download command'
 old_org=aspuru-guzik'-group'
 if grep -Rqs --exclude-dir=.git --exclude-dir=image "$old_org" "$ROOT"; then
   printf 'not ok - old workshop GitHub organization remains in tracked source\n'
