@@ -1,9 +1,11 @@
 #!/bin/sh
 set -eu
 
-WORKSPACE="${CDMX_WORKSPACE:-/var/lib/cdmx-picoclaw/workspace}"
-START_DIR="$HOME"
+WORKSPACE="${CDMX_WORKSPACE:-$HOME/workspace}"
+START_DIR="$WORKSPACE"
 TITLE='Workshop Terminal'
+
+[ -d "$START_DIR" ] || START_DIR="$HOME"
 
 case "${1:-}" in
     workspace)

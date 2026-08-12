@@ -51,8 +51,16 @@ if [[ $EUID -ne 0 ]]; then
     exit 77
 fi
 case "$team" in
-    0|1|2|3|4|5|6|7|8|9) device_hostname="equipo$team"; network_index=$team ;;
-    admin) device_hostname=admin; network_index=10 ;;
+    0|1|2|3|4|5|6|7|8|9)
+        device_hostname="equipo$team"; network_index=$team
+        desktop_memory_high=256M; desktop_memory_max=320M
+        agent_memory_high=192M; agent_memory_max=256M
+        ;;
+    admin)
+        device_hostname='admin'; network_index=10
+        desktop_memory_high=384M; desktop_memory_max=512M
+        agent_memory_high=384M; agent_memory_max=512M
+        ;;
     *) printf '%s\n' '--team must be 0-9 or admin' >&2; exit 64 ;;
 esac
 
@@ -84,7 +92,7 @@ apt-get install -y --no-install-recommends \
     network-manager novnc openbox openssh-server python3 python3-matplotlib \
     python3-numpy python3-pil python3-pip python3-smbus python3-spidev \
     python3-venv rfkill sudo tigervnc-standalone-server \
-    tint2 tmux ufw unattended-upgrades websockify x11-xserver-utils xauth xterm \
+    tint2 tmux ufw unattended-upgrades websockify x11-xserver-utils xauth xdotool xterm \
     zram-tools
 
 if ! id "$workshop_user" >/dev/null 2>&1; then
@@ -205,6 +213,20 @@ usermod -aG cdmx-workspace "$workshop_user"
 install -d -m 0750 -o "$workshop_user" -g "$workshop_user" \
     "/home/$workshop_user/.pi" "/home/$workshop_user/.picoclaw"
 install -d -m 2770 -o "$workshop_user" -g cdmx-workspace /var/lib/cdmx-picoclaw/workspace
+home_workspace="/home/$workshop_user/workspace"
+if [[ -d $home_workspace && ! -L $home_workspace ]]; then
+    if find "$home_workspace" -mindepth 1 -print -quit | grep -q .; then
+        printf 'Refusing to replace non-empty participant workspace: %s\n' "$home_workspace" >&2
+        exit 65
+    fi
+    rmdir "$home_workspace"
+fi
+if [[ -e $home_workspace && ! -L $home_workspace ]]; then
+    printf 'Refusing to replace participant workspace path: %s\n' "$home_workspace" >&2
+    exit 65
+fi
+ln -sfn /var/lib/cdmx-picoclaw/workspace "$home_workspace"
+chown -h "$workshop_user:$workshop_user" "$home_workspace"
 cat > /etc/cdmx/workshop.conf <<EOF
 TEAM=$team
 HOSTNAME=$device_hostname
@@ -249,6 +271,8 @@ chmod 0755 /opt/cdmx-radxa-flash/device/network/cdmx-network \
 
 install -m 0755 /opt/cdmx-radxa-flash/device/desktop/fetch-workshop-repos.sh \
     /usr/local/bin/cdmx-get-workshop-repos
+ln -sfn cdmx-get-workshop-repos /usr/local/bin/cdmx-get-bayesopt
+ln -sfn cdmx-get-workshop-repos /usr/local/bin/cdmx-get-local-ai
 install -m 0644 -o "$workshop_user" -g "$workshop_user" \
     /opt/cdmx-radxa-flash/device/desktop/WORKSHOP-README.txt \
     "/home/$workshop_user/WORKSHOP-README.txt"
@@ -350,6 +374,26 @@ systemctl enable ssh avahi-daemon NetworkManager zramswap \
     cdmx-network-monitor.service cdmx-usb-rescue.service cdmx-desktop.service cdmx-novnc.service
 if [[ -f /etc/systemd/system/cdmx-picoclaw.service ]]; then
     systemctl enable cdmx-picoclaw.service
+fi
+
+# Keep one misbehaving graphical app or agent from exhausting a 1 GB team
+# board. The admin image has 2 GB and receives proportionally larger ceilings.
+install -d -m 0755 /etc/systemd/system/cdmx-desktop.service.d \
+    /etc/systemd/system/cdmx-picoclaw.service.d
+cat > /etc/systemd/system/cdmx-desktop.service.d/20-memory.conf <<EOF
+[Service]
+MemoryHigh=$desktop_memory_high
+MemoryMax=$desktop_memory_max
+TasksMax=192
+EOF
+cat > /etc/systemd/system/cdmx-picoclaw.service.d/20-memory.conf <<EOF
+[Service]
+MemoryHigh=$agent_memory_high
+MemoryMax=$agent_memory_max
+TasksMax=128
+EOF
+if ! $offline_image; then
+    systemctl daemon-reload
 fi
 
 chown -R "$workshop_user:$workshop_user" "/home/$workshop_user/.pi" "/home/$workshop_user/.picoclaw"

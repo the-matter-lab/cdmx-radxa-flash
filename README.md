@@ -67,8 +67,8 @@ comandos existente con `host/flash-team.sh`.
 ## Qué contiene la imagen
 
 - RadxaOS Debian 12 Bookworm arm64 para ZERO 3, versión fijada `rsdk-b1`.
-- Escritorio Openbox ligero de 1280×720, tres espacios de trabajo, terminal,
-  Geany, monitor de CPU/RAM/temperatura y fondo de Matter Lab.
+- Escritorio Openbox ligero de 1280×720 con panel inferior persistente, tres
+  espacios de trabajo, terminal, Geany, monitor y fondo de Matter Lab.
 - noVNC compartido: control en `control.html` y observación en `view.html`.
 - Portal cautivo para introducir el Wi‑Fi del recinto sin teclado.
 - SSH mediante clave pública, `sudo` local sin contraseña y servicios systemd
@@ -81,6 +81,8 @@ comandos existente con `host/flash-team.sh`.
 - Un lanzador que clona o actualiza `cdmx-local-ai` y `cdmx-bayesopt` cuando el
   participante lo elige. Los repositorios de ejercicios no se clonan de
   antemano.
+- Ruta sencilla `~/workspace`, botones para reabrir aplicaciones y límites de
+  memoria distintos para los equipos de 1 GB y la placa admin de 2 GB.
 
 Samba no forma parte de las tarjetas del taller. La imagen elimina KDE,
 navegadores locales y paquetes Samba para reducir almacenamiento y RAM en las

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-WORKSPACE=${CDMX_WORKSPACE:-/var/lib/cdmx-picoclaw/workspace}
+WORKSPACE=${CDMX_WORKSPACE:-/home/cdmx/workspace}
 
 update_repo() {
     local name=$1 url=$2 target=$WORKSPACE/$1
@@ -20,8 +20,29 @@ update_repo() {
     fi
 }
 
-mkdir -p "$WORKSPACE"
-update_repo cdmx-bayesopt https://github.com/the-matter-lab/cdmx-bayesopt.git
-update_repo cdmx-local-ai https://github.com/the-matter-lab/cdmx-local-ai.git
+selection=${1:-all}
+case "$(basename "$0")" in
+    cdmx-get-bayesopt) selection=bayesopt ;;
+    cdmx-get-local-ai) selection=local-ai ;;
+esac
 
-printf '\nReady. Workshop code is in:\n%s\n' "$WORKSPACE"
+mkdir -p "$WORKSPACE"
+case "$selection" in
+    all)
+        update_repo cdmx-bayesopt https://github.com/the-matter-lab/cdmx-bayesopt.git
+        update_repo cdmx-local-ai https://github.com/the-matter-lab/cdmx-local-ai.git
+        ;;
+    bayesopt)
+        update_repo cdmx-bayesopt https://github.com/the-matter-lab/cdmx-bayesopt.git
+        ;;
+    local-ai)
+        update_repo cdmx-local-ai https://github.com/the-matter-lab/cdmx-local-ai.git
+        ;;
+    *)
+        printf 'Usage: %s [all|bayesopt|local-ai]\n' "$(basename "$0")" >&2
+        exit 64
+        ;;
+esac
+
+printf '\nReady. Open the code at:\n  ~/workspace\n'
+find "$WORKSPACE" -mindepth 1 -maxdepth 1 -type d -print 2>/dev/null | sed "s|^$WORKSPACE/|  ~/workspace/|"

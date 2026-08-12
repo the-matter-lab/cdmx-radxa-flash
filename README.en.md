@@ -67,8 +67,8 @@ and asks for one administrator authorization. The existing
 ## Image contents
 
 - Pinned RadxaOS Debian 12 Bookworm arm64 for ZERO 3, release `rsdk-b1`.
-- Lightweight 1280×720 Openbox desktop with three workspaces, terminal, Geany,
-  CPU/RAM/temperature monitor, and Matter Lab wallpaper.
+- Lightweight 1280×720 Openbox desktop with a persistent bottom panel, three
+  workspaces, terminal, Geany, monitor, and Matter Lab wallpaper.
 - Shared noVNC desktop: control through `control.html`, observation through
   `view.html`.
 - Captive Wi-Fi portal for keyboard-free venue onboarding.
@@ -81,6 +81,8 @@ and asks for one administrator authorization. The existing
   duplicated here.
 - A launcher that clones or updates `cdmx-local-ai` and `cdmx-bayesopt` when a
   participant chooses it. Exercise repositories are not pre-cloned.
+- Simple `~/workspace` path, persistent buttons for reopening apps, and
+  separate memory ceilings for 1 GB team boards and the 2 GB admin board.
 
 Samba is not part of the workshop cards. The image removes KDE, local browsers,
 and Samba packages to conserve storage and RAM on the 1 GB boards.

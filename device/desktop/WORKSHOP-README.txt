@@ -2,19 +2,28 @@ MATTER LAB INTERNATIONAL CONFERENCE 2026 - SATELLITE SCHOOL
 
 INICIO RAPIDO
 
-1. Haga clic derecho en el fondo negro.
-2. Elija "Download/update workshop code".
-3. Se descargaran o actualizaran automaticamente estos repositorios:
-   - cdmx-bayesopt
-   - cdmx-local-ai
-4. Los encontrara en:
-   /var/lib/cdmx-picoclaw/workspace
+La barra inferior siempre permanece disponible:
 
-Tambien puede abrir una terminal y ejecutar:
-   cdmx-get-workshop-repos
+  APPS       todas las aplicaciones y ventanas abiertas
+  Terminal   terminal nueva dentro de ~/workspace
+  Code       editor grafico
+  Get code   descarga o actualiza los dos repositorios
+  Agent      abre Pi Agent
+  Monitor    CPU, memoria y procesos
 
-Use la barra inferior para cambiar entre WORK, AGENT y RUN.
-Arrastre las ventanas desde la barra de titulo y cambie entre ellas con Alt+Tab.
+WORK, AGENT y RUN son tres escritorios. Las ventanas abiertas aparecen como
+botones en la barra inferior: haga clic para ocultarlas o restaurarlas. Si
+cierra una ventana con X, vuelva a abrirla desde la misma barra o desde APPS.
+
+El codigo del equipo siempre esta en:
+
+  ~/workspace
+
+Descarga rapida desde Terminal:
+
+  cdmx-get-bayesopt       solo cdmx-bayesopt
+  cdmx-get-local-ai       solo cdmx-local-ai
+  cdmx-get-workshop-repos ambos repositorios
 
 CABLEADO
 
@@ -23,12 +32,24 @@ NeoPixel: DIN=pin 19, GND=pin 20, 5V separado=pin 2.
 
 QUICK START
 
-1. Right-click the black desktop background.
-2. Choose "Download/update workshop code".
-3. The two workshop repositories will be cloned or safely updated.
-4. Find them in /var/lib/cdmx-picoclaw/workspace.
+The bottom panel always remains available:
 
-You can also run cdmx-get-workshop-repos in a terminal.
+  APPS       all applications and currently open windows
+  Terminal   a new terminal inside ~/workspace
+  Code       graphical editor
+  Get code   download or update both repositories
+  Agent      open Pi Agent
+  Monitor    CPU, memory, and processes
+
+WORK, AGENT, and RUN are three desktops. Every open window appears as a button
+in the bottom panel; click it to hide or restore the window. If you close a
+window with X, reopen it from the same panel or APPS.
+
+Team code always lives in ~/workspace. Terminal download commands:
+
+  cdmx-get-bayesopt
+  cdmx-get-local-ai
+  cdmx-get-workshop-repos
 
 WIRING
 

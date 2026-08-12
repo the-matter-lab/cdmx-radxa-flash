@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-WORKSPACE="${CDMX_WORKSPACE:-/var/lib/cdmx-picoclaw/workspace}"
+WORKSPACE="${CDMX_WORKSPACE:-$HOME/workspace}"
 
 while :; do
     clear

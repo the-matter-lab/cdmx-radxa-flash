@@ -5,6 +5,12 @@
     <followMouse>no</followMouse>
     <raiseOnFocus>no</raiseOnFocus>
   </focus>
+  <theme>
+    <name>Onyx</name>
+    <titleLayout>NLIMC</titleLayout>
+    <keepBorder>yes</keepBorder>
+    <animateIconify>no</animateIconify>
+  </theme>
   <desktops>
     <number>3</number>
     <firstdesk>1</firstdesk>
@@ -16,39 +22,30 @@
     <popupTime>875</popupTime>
   </desktops>
   <applications>
-    <application title="System Status">
-      <decor>no</decor>
-      <layer>above</layer>
-      <desktop>all</desktop>
-      <skip_taskbar>yes</skip_taskbar>
-      <skip_pager>yes</skip_pager>
-      <position force="yes"><x>650</x><y>24</y></position>
-      <size><width>600</width><height>52</height></size>
-    </application>
     <application title="Workspace Terminal">
       <desktop>1</desktop>
-      <position force="yes"><x>20</x><y>128</y></position>
-      <size><width>1240</width><height>500</height></size>
+      <position force="yes"><x>20</x><y>112</y></position>
+      <size><width>1240</width><height>530</height></size>
     </application>
     <application title="Pi Agent">
       <desktop>2</desktop>
-      <position force="yes"><x>20</x><y>128</y></position>
-      <size><width>610</width><height>500</height></size>
+      <position force="yes"><x>20</x><y>112</y></position>
+      <size><width>610</width><height>530</height></size>
     </application>
-    <application title="Channel + Workspace">
+    <application title="PicoClaw Activity">
       <desktop>2</desktop>
-      <position force="yes"><x>650</x><y>128</y></position>
-      <size><width>610</width><height>500</height></size>
+      <position force="yes"><x>650</x><y>112</y></position>
+      <size><width>610</width><height>530</height></size>
     </application>
     <application title="Experiment Terminal">
       <desktop>3</desktop>
-      <position force="yes"><x>20</x><y>128</y></position>
-      <size><width>800</width><height>500</height></size>
+      <position force="yes"><x>20</x><y>112</y></position>
+      <size><width>800</width><height>530</height></size>
     </application>
     <application title="System Monitor">
       <desktop>3</desktop>
-      <position force="yes"><x>840</x><y>128</y></position>
-      <size><width>420</width><height>500</height></size>
+      <position force="yes"><x>840</x><y>112</y></position>
+      <size><width>420</width><height>530</height></size>
     </application>
   </applications>
   <keyboard>
@@ -77,7 +74,7 @@
       <action name="Execute"><command>/opt/cdmx-radxa-flash/device/desktop/open-editor.sh</command></action>
     </keybind>
     <keybind key="C-A-p">
-      <action name="Execute"><command>xterm -title 'Pi Agent' -geometry 100x30 -fa Monospace -fs 10 -bg '#0b1020' -fg '#e5e7eb' -e /opt/cdmx-radxa-flash/device/desktop/pi-terminal.sh</command></action>
+      <action name="Execute"><command>/opt/cdmx-radxa-flash/device/desktop/open-agent.sh</command></action>
     </keybind>
     <keybind key="W-space"><action name="ShowMenu"><menu>root-menu</menu></action></keybind>
     <keybind key="W-d"><action name="ToggleShowDesktop"/></keybind>

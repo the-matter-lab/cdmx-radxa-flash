@@ -1,6 +1,9 @@
 #!/bin/sh
 set -eu
 
+WORKSPACE="${CDMX_WORKSPACE:-$HOME/workspace}"
+[ ! -d "$WORKSPACE" ] || cd "$WORKSPACE"
+
 clear
 printf '%s\n' \
     'CDMX Local AI — Pi Agent' \

@@ -12,24 +12,24 @@ Sustituya `N` por el número de su equipo.
 4. Envíe un mensaje que mencione al bot de Telegram de su equipo. El bot solo
    funciona para las cinco personas autorizadas por el instructor.
 
-El escritorio noVNC se organiza en tres espacios visibles en la barra inferior:
-`WORK` para código, `AGENT` para Pi Agent y el canal, y `RUN` para experimentos
-y el monitor del sistema. Haga clic en sus nombres para cambiar de espacio.
-Arrastre una ventana desde su barra de título, redimensiónela desde los bordes y
-use `Alt+Tab` para cambiar de ventana. También puede usar `Ctrl+Alt+←/→` para
-cambiar de espacio y `Super+1/2/3` para ir directamente a uno.
+El escritorio noVNC tiene una sola barra inferior. Sus botones `APPS`,
+`Terminal`, `Code`, `Get code`, `Agent` y `Monitor` permanecen visibles aunque
+cierre una aplicación. Cada ventana abierta aparece también en esa barra:
+haga clic en su botón para ocultarla o restaurarla. Si la cierra con X, pulse
+otra vez su lanzador. `WORK`, `AGENT` y `RUN` cambian entre los tres escritorios.
 
-Haga clic derecho en cualquier parte vacía del fondo para abrir el menú de
-aplicaciones. Desde ahí puede abrir una terminal, una terminal dentro del
-espacio de trabajo, los editores Geany o Nano, Pi Agent o el monitor del sistema.
-`Ctrl+Alt+T` abre una terminal nueva, `Ctrl+Alt+E` abre Geany y `Super+Espacio`
-muestra el menú.
+Pulse `Get code` para descargar o actualizar automáticamente `cdmx-bayesopt` y
+`cdmx-local-ai`. También puede descargarlos por separado desde `APPS` o desde
+una terminal:
 
-Elija `Download/update workshop code` en ese mismo menú para descargar o
-actualizar automáticamente `cdmx-bayesopt` y `cdmx-local-ai`. No necesita
-escribir las direcciones. También puede ejecutar `cdmx-get-workshop-repos` en
-una terminal. El lanzador nunca sobrescribe una carpeta que no sea un
-repositorio Git.
+```bash
+cdmx-get-bayesopt
+cdmx-get-local-ai
+cdmx-get-workshop-repos
+```
+
+No necesita una cuenta de GitHub. El lanzador nunca sobrescribe una carpeta
+que no sea un repositorio Git.
 
 Otros medios de acceso:
 
@@ -37,8 +37,9 @@ Otros medios de acceso:
 SSH:    ssh cdmx@equipoN.local
 ```
 
-El directorio de código compartido es `/var/lib/cdmx-picoclaw/workspace`.
-Guarde ahí todo el trabajo del agente. No pegue claves de API ni tokens de bots
+El directorio de código compartido es `~/workspace`. El enlace conserva el
+almacenamiento protegido de PicoClaw sin mostrar su ruta interna. Guarde ahí
+todo el trabajo del agente. No pegue claves de API ni tokens de bots
 en el chat, en archivos de código fuente ni en la terminal.
 
 La cuenta `cdmx` puede ejecutar `sudo` sin contraseña para instalar dependencias
