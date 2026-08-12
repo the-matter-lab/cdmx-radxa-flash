@@ -142,9 +142,12 @@ image/cdmx-workshop-golden.img.xz
 image/cdmx-workshop-golden.img.xz.sha512
 ```
 
-Antes de publicar, actualice `version`, tamaños, SHA‑512 y `docker` en
-`site/manifest.json`. El mismo archivo alimenta la web pública y ambos
-ayudantes, de modo que todos graban exactamente la misma versión.
+Antes de publicar, actualice `version`, tamaños, SHA‑512, `docker` y los commits
+inmutables de `simulator` en `site/manifest.json`. El mismo archivo alimenta la
+web pública, ambos ayudantes y
+[el simulador del taller](https://radxa-simulator.mantilla.ca), de modo que
+todos usan exactamente la misma versión. Lepton consulta el manifiesto cada
+cinco minutos y actualiza el simulador cuando cambia ese fingerprint.
 
 ## Docker y publicación
 

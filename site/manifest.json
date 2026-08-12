@@ -11,6 +11,12 @@
     "compressed_bytes": 1908043732,
     "uncompressed_bytes": 8074662912
   },
+  "simulator": {
+    "url": "https://radxa-simulator.mantilla.ca",
+    "source_commit": "c75070da318021b0889c00924c824dfeba4a306e",
+    "bayesopt_source": "https://github.com/the-matter-lab/cdmx-bayesopt",
+    "bayesopt_commit": "2932febb16af89a465d4e7903d4eb0268489c045"
+  },
   "launchers": {
     "macos_terminal": "https://cdmx-radxaflash.mantilla.ca/start-macos.sh",
     "windows_powershell": "https://cdmx-radxaflash.mantilla.ca/start-windows.ps1",
