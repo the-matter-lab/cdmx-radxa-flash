@@ -432,7 +432,36 @@ def update_transfer(phase: str, label: str, done: int, total: int, start: float,
 
 
 def cached_image_path(image: dict[str, object]) -> Path:
-    return cache_directory() / str(image["filename"])
+    digest = str(image["sha512"]).lower()
+    return cache_directory() / f"{digest[:16]}-{image['filename']}"
+
+
+def discard_cached_image(path: Path) -> None:
+    for candidate in (path, Path(str(path) + ".sha512"), path.with_name(path.name + ".partial")):
+        candidate.unlink(missing_ok=True)
+
+
+def migrate_legacy_cache(image: dict[str, object], destination: Path) -> None:
+    legacy = cache_directory() / str(image["filename"])
+    if legacy == destination or not legacy.exists():
+        return
+    expected_digest = str(image["sha512"])
+    expected_size = int(image["compressed_bytes"])
+    legacy_sidecar = Path(str(legacy) + ".sha512")
+    if (
+        not destination.exists()
+        and legacy.is_file()
+        and legacy.stat().st_size == expected_size
+        and sidecar_digest(legacy) == expected_digest
+    ):
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        os.replace(legacy, destination)
+        if legacy_sidecar.is_file():
+            os.replace(legacy_sidecar, Path(str(destination) + ".sha512"))
+        STATE.log("Reused the verified legacy image cache")
+        return
+    STATE.log("Removed an image cached for an older release")
+    discard_cached_image(legacy)
 
 
 def sidecar_digest(path: Path) -> str | None:
@@ -501,11 +530,22 @@ def prepare_image() -> tuple[Path, dict[str, object]]:
         path = LOCAL_GOLDEN_IMAGE
     else:
         path = cached_image_path(image)
-        if not path.is_file():
-            STATE.log(f"Downloading image version {manifest.get('version', 'latest')}")
-            download_image(image, path)
-            STATE.log("Download checksum passed")
-            return path, image
+        migrate_legacy_cache(image, path)
+        if path.is_file():
+            try:
+                if path.stat().st_size != int(image["compressed_bytes"]):
+                    raise ValueError("cached image size mismatch")
+                hash_compressed_image(path, expected)
+            except (OSError, ValueError) as error:
+                STATE.log(f"Discarded invalid cached image: {error}")
+                discard_cached_image(path)
+            else:
+                STATE.log("Compressed checksum passed")
+                return path, image
+        STATE.log(f"Downloading image version {manifest.get('version', 'latest')}")
+        download_image(image, path)
+        STATE.log("Download checksum passed")
+        return path, image
     if not path.is_file():
         raise FileNotFoundError(f"image not found: {path}")
     hash_compressed_image(path, expected)

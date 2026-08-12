@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import http.client
 from pathlib import Path
@@ -170,6 +171,81 @@ class ImagerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             imager.validate_manifest(manifest)
 
+    def test_stale_legacy_cache_is_removed_and_redownloaded(self):
+        payload = b"current image"
+        digest = hashlib.sha512(payload).hexdigest()
+        manifest = {
+            "schema": 1,
+            "version": "current",
+            "image": {
+                "filename": "workshop.img.xz",
+                "url": "https://example.test/workshop-current.img.xz",
+                "sha512": digest,
+                "compressed_bytes": len(payload),
+                "uncompressed_bytes": 8_000_000_000,
+            },
+        }
+        previous_runtime = dict(imager.RUNTIME)
+        try:
+            with tempfile.TemporaryDirectory() as temporary:
+                cache = Path(temporary)
+                legacy = cache / "workshop.img.xz"
+                legacy.write_bytes(b"previous image")
+                Path(str(legacy) + ".sha512").write_text(f"{'0' * 128}  {legacy.name}\n")
+
+                def fake_download(_image, destination):
+                    self.assertFalse(legacy.exists())
+                    destination.write_bytes(payload)
+
+                imager.RUNTIME.clear()
+                imager.RUNTIME["manifest"] = manifest
+                with (
+                    mock.patch.object(imager, "cache_directory", return_value=cache),
+                    mock.patch.object(imager, "download_image", side_effect=fake_download) as download,
+                ):
+                    path, _ = imager.prepare_image()
+                self.assertEqual(path.name, f"{digest[:16]}-workshop.img.xz")
+                self.assertEqual(path.read_bytes(), payload)
+                self.assertFalse(legacy.exists())
+                download.assert_called_once()
+        finally:
+            imager.RUNTIME.clear()
+            imager.RUNTIME.update(previous_runtime)
+
+    def test_corrupt_versioned_cache_self_heals(self):
+        payload = b"current image"
+        digest = hashlib.sha512(payload).hexdigest()
+        image = {
+            "filename": "workshop.img.xz",
+            "url": "https://example.test/workshop-current.img.xz",
+            "sha512": digest,
+            "compressed_bytes": len(payload),
+            "uncompressed_bytes": 8_000_000_000,
+        }
+        previous_runtime = dict(imager.RUNTIME)
+        try:
+            with tempfile.TemporaryDirectory() as temporary:
+                cache = Path(temporary)
+                cached = cache / f"{digest[:16]}-workshop.img.xz"
+                cached.write_bytes(b"broken image!")
+
+                def fake_download(_image, destination):
+                    self.assertFalse(destination.exists())
+                    destination.write_bytes(payload)
+
+                imager.RUNTIME.clear()
+                imager.RUNTIME["manifest"] = {"schema": 1, "version": "current", "image": image}
+                with (
+                    mock.patch.object(imager, "cache_directory", return_value=cache),
+                    mock.patch.object(imager, "download_image", side_effect=fake_download) as download,
+                ):
+                    path, _ = imager.prepare_image()
+                self.assertEqual(path.read_bytes(), payload)
+                download.assert_called_once()
+        finally:
+            imager.RUNTIME.clear()
+            imager.RUNTIME.update(previous_runtime)
+
     def test_ui_has_all_teams_and_progress_semantics(self):
         public_html = (MODULE_PATH.parents[1] / "site" / "index.html").read_text(encoding="utf-8")
         self.assertIn("role=\"progressbar\"", public_html)
@@ -193,18 +269,18 @@ class ImagerTests(unittest.TestCase):
         self.assertIn(imager.PUBLIC_SITE_URL, (MODULE_PATH.parents[1] / "host" / "start-imager.command").read_text())
 
         mac_launcher = (MODULE_PATH.parents[1] / "site" / "start-macos.sh").read_text(encoding="utf-8")
-        self.assertIn("SOURCE_COMMIT=046792ad3de1949d04870c487bd11c06038aad16", mac_launcher)
-        self.assertIn("ARCHIVE_SHA256=422cc59609458428e0a534e806565c11072af0327ae27c09b047ace243040ff1", mac_launcher)
+        self.assertIn("SOURCE_COMMIT=ade5f3b540ad4ac4fb6a5b943c98a0f50bdf87b2", mac_launcher)
+        self.assertIn("ARCHIVE_SHA256=5dd25c9b65589c8460582a09652c64a3641b382bdd9a8322ec8eaf828fd57a9f", mac_launcher)
         self.assertIn("codeload.github.com/the-matter-lab/cdmx-radxa-flash", mac_launcher)
         self.assertIn("shasum -a 256", mac_launcher)
 
         linux_launcher = (MODULE_PATH.parents[1] / "site" / "start-linux.sh").read_text(encoding="utf-8")
-        self.assertIn("SOURCE_COMMIT=046792ad3de1949d04870c487bd11c06038aad16", linux_launcher)
+        self.assertIn("SOURCE_COMMIT=ade5f3b540ad4ac4fb6a5b943c98a0f50bdf87b2", linux_launcher)
         self.assertIn("sha256sum", linux_launcher)
         self.assertIn("exec sudo", linux_launcher)
 
         windows_launcher = (MODULE_PATH.parents[1] / "site" / "start-windows.ps1").read_text(encoding="utf-8")
-        self.assertIn('$SourceCommit = "046792ad3de1949d04870c487bd11c06038aad16"', windows_launcher)
+        self.assertIn('$SourceCommit = "ade5f3b540ad4ac4fb6a5b943c98a0f50bdf87b2"', windows_launcher)
         self.assertIn("Get-FileHash -Algorithm SHA256", windows_launcher)
         self.assertIn("WindowsBuiltInRole]::Administrator", windows_launcher)
 
