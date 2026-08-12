@@ -29,7 +29,6 @@ from typing import BinaryIO
 HOST_SYSTEM = platform.system()
 SOURCE_ROOT = Path(__file__).resolve().parents[1]
 BUNDLE_ROOT = Path(getattr(sys, "_MEIPASS", SOURCE_ROOT))
-UI_PATH = BUNDLE_ROOT / "host" / "imager_ui.html"
 LOCAL_MANIFEST = BUNDLE_ROOT / "site" / "manifest.json"
 DEFAULT_MANIFEST_URL = "https://cdmx-radxaflash.mantilla.ca/manifest.json"
 TRUSTED_WEB_ORIGIN = "https://cdmx-radxaflash.mantilla.ca"
@@ -765,23 +764,13 @@ class ImagerHandler(BaseHTTPRequestHandler):
             self.json_response(HTTPStatus.FORBIDDEN, {"error": "invalid host"})
             return
         if self.path == "/":
-            nonce = secrets.token_urlsafe(16)
-            html = UI_PATH.read_text(encoding="utf-8")
-            html = html.replace("__CDMX_TOKEN__", self.token).replace("__CDMX_NONCE__", nonce)
-            body = html.encode()
-            self.send_response(HTTPStatus.OK)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Length", str(len(body)))
+            self.send_response(HTTPStatus.FOUND)
+            self.send_header("Location", PUBLIC_SITE_URL)
             self.send_header("Cache-Control", "no-store")
-            self.send_header(
-                "Content-Security-Policy",
-                f"default-src 'none'; script-src 'nonce-{nonce}'; style-src 'nonce-{nonce}'; connect-src 'self'; img-src 'self'",
-            )
-            self.send_header("X-Frame-Options", "DENY")
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("Referrer-Policy", "no-referrer")
+            self.send_header("Content-Length", "0")
             self.end_headers()
-            self.wfile.write(body)
         elif self.path == "/api/session":
             if not self.trusted_web_origin():
                 self.json_response(HTTPStatus.FORBIDDEN, {"error": "origin not allowed"})
@@ -862,9 +851,6 @@ def main() -> int:
     if not is_administrator():
         print("Start this helper as Administrator so it can access the removable SD card.")
         return 77
-    if not UI_PATH.is_file():
-        print("The imager UI is missing from this package.")
-        return 66
     try:
         initialize_runtime(args.manifest, args.image)
     except Exception as exc:
@@ -872,9 +858,8 @@ def main() -> int:
         return 69
     token = secrets.token_urlsafe(32)
     server = ImagerServer(("127.0.0.1", args.port), token)
-    local_url = f"http://127.0.0.1:{args.port}/"
-    print(f"CDMX Radxa Flasher API: {local_url}", flush=True)
-    print(f"Web interface: {PUBLIC_SITE_URL}", flush=True)
+    print("CDMX Radxa Flasher is ready.", flush=True)
+    print(f"Open: {PUBLIC_SITE_URL}", flush=True)
     print("Keep this window open while flashing cards.", flush=True)
     if not args.no_browser:
         threading.Timer(0.8, lambda: webbrowser.open(PUBLIC_SITE_URL)).start()

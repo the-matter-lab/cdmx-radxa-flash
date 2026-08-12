@@ -30,6 +30,10 @@ USB/SD extraíbles, vuelve a comprobar el destino antes de borrarlo y descarga l
 versión indicada en [`site/manifest.json`](site/manifest.json). La imagen y su
 SHA‑512 se guardan en caché para las tarjetas siguientes.
 
+Solo existe una interfaz de usuario: la web pública. `127.0.0.1:8766` es el
+puente local privado y su raíz redirige a la web pública; no presenta una
+segunda pantalla de flasheo.
+
 Los tres comandos descargan un snapshot de código fuente fijado por commit,
 comprueban su SHA‑256 y lo ejecutan con Python local. En macOS esto evita el
 bloqueo de Gatekeeper para aplicaciones sin firma. La contraseña solo autoriza

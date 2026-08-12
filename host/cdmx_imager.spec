@@ -9,7 +9,6 @@ a = Analysis(
     pathex=[str(root)],
     binaries=[],
     datas=[
-        (str(root / "host" / "imager_ui.html"), "host"),
         (str(root / "site" / "manifest.json"), "site"),
     ],
     hiddenimports=["pyfatfs.PyFatFS", "pyfatfs.PyFat", "fs"],

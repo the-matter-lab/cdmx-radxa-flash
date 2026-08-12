@@ -129,14 +129,9 @@ class ImagerTests(unittest.TestCase):
             imager.validate_manifest(manifest)
 
     def test_ui_has_all_teams_and_progress_semantics(self):
-        html = imager.UI_PATH.read_text(encoding="utf-8")
-        self.assertIn("role=\"progressbar\"", html)
-        self.assertIn("'admin'", html)
-        self.assertIn("IDENTITIES", html)
-        self.assertIn("__CDMX_TOKEN__", html)
-        self.assertNotIn("/api/repair", html)
-
         public_html = (MODULE_PATH.parents[1] / "site" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("role=\"progressbar\"", public_html)
+        self.assertIn("'admin'", public_html)
         self.assertIn("http://127.0.0.1:8766", public_html)
         self.assertIn("/api/session", public_html)
         self.assertIn("/api/flash", public_html)
@@ -198,6 +193,14 @@ class ImagerTests(unittest.TestCase):
         thread.start()
         port = server.server_address[1]
         try:
+            connection = http.client.HTTPConnection("127.0.0.1", port, timeout=3)
+            connection.request("GET", "/")
+            response = connection.getresponse()
+            self.assertEqual(response.status, 302)
+            self.assertEqual(response.getheader("Location"), imager.PUBLIC_SITE_URL)
+            self.assertEqual(response.read(), b"")
+            connection.close()
+
             connection = http.client.HTTPConnection("127.0.0.1", port, timeout=3)
             connection.request("GET", "/api/session", headers={"Origin": imager.TRUSTED_WEB_ORIGIN})
             response = connection.getresponse()

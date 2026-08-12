@@ -15,9 +15,9 @@ leer los 8,074,662,912 bytes y escribe `cdmx-team.env` directamente en la
 partición FAT de configuración. Esa última operación funciona también en
 Windows aunque el sistema no asigne una letra a la partición de Radxa.
 
-La interfaz está en `http://127.0.0.1:8766/`; no acepta conexiones desde la LAN.
-La web pública solo distribuye el ayudante y metadatos, y nunca recibe acceso al
-disco local.
+La única interfaz está en `https://cdmx-radxaflash.mantilla.ca`. El servicio en
+`127.0.0.1:8766` es solo el puente privado hacia el disco, no acepta conexiones
+desde la LAN y redirige su raíz a la web pública.
 
 La acción **Desinstalar** de la web muestra un comando por sistema operativo.
 Elimina el código descargado, `.venv-imager` y la imagen en caché, y detiene
