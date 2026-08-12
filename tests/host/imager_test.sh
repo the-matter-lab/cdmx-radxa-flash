@@ -140,6 +140,10 @@ assert_eq 0 "$(grep -c 'uptime\|/proc/uptime' "$ROOT/device/desktop/system-statu
   'compact status removes the elapsed-seconds counter'
 assert_eq 0 "$(grep -Ec "open-terminal|open-monitor|xterm -title 'System Status'|xterm -title 'Pi Agent'" "$ROOT/device/desktop/start-session.sh")" \
   'desktop does not pre-open RAM-heavy applications'
+assert_eq 0 "$(grep -Ec '^(NoNewPrivileges|PrivateDevices|ProtectSystem|ProtectHome)=' "$ROOT/device/systemd/cdmx-desktop.service" || true)" \
+  'shared desktop terminals can use sudo and workshop GPIO devices'
+assert_eq 1 "$(grep -c '^NoNewPrivileges=true$' "$ROOT/device/systemd/cdmx-novnc.service")" \
+  'noVNC gateway retains its privilege sandbox'
 assert_eq 1 "$(grep -c 'execp_command = printf '\'' APPS '\''' "$ROOT/device/desktop/tint2rc")" \
   'bottom panel has a persistent applications launcher'
 assert_eq 0 "$(grep -c 'Get code' "$ROOT/device/desktop/tint2rc" || true)" \
