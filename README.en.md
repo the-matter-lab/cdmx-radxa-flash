@@ -80,6 +80,11 @@ admin:   http://10.42.10.1:8080/
 
 After saving Wi-Fi, reconnect the laptop or phone to that LAN:
 
+If the saved network becomes unavailable, the board retries it and, after
+approximately 60–75 seconds offline, advertises `equipoN-setup` (or
+`admin-setup`) again. Rejoin that network to enter a new SSID and password; the
+card does not need to be reflashed.
+
 | Purpose | Address |
 |---|---|
 | noVNC control | `http://equipoN.local:6080/control.html` |

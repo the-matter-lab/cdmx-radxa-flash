@@ -68,6 +68,11 @@ else
 fi
 assert_eq OPEN_ACCESS=1 "$(grep '^OPEN_ACCESS=' "$ROOT/device/personalize.sh")" 'clones keep the passwordless setup AP'
 assert_eq RuntimeDirectory=cdmx "$(grep '^RuntimeDirectory=' "$ROOT/device/systemd/cdmx-network-portal.service")" 'portal runtime directory exists before sandboxing'
+assert_eq 1 "$(grep -c 'cdmx-network-monitor.service' "$ROOT/device/install.sh")" \
+  'image enables the runtime Wi-Fi recovery monitor'
+assert_eq "fallback_delay=\${CDMX_NETWORK_FALLBACK_DELAY:-60}" \
+  "$(grep '^fallback_delay=' "$ROOT/device/network/cdmx-network")" \
+  'offline boards restore onboarding after a bounded delay'
 assert_eq f10ff6c5b0d8d306f8117091bb3760f6662f097c \
   "$(bash -c 'source "$1"; printf %s "$AGENT_REPO_REF"' _ "$ROOT/image/cdmx-local-ai.env")" \
   'image build pins the separate local-agent repository commit'

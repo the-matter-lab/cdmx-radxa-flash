@@ -2,6 +2,7 @@
 
 test:
 	./tests/host/imager_test.sh
+	./tests/host/network_monitor_test.sh
 	python3 -m unittest tests/test_network_portal.py
 	python3 -m unittest tests/test_imager_app.py
 	python3 -m py_compile host/imager_app.py device/network/network_portal.py

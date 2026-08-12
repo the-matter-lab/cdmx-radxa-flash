@@ -274,7 +274,7 @@ if ! $offline_image; then
 fi
 systemctl enable ssh avahi-daemon NetworkManager zramswap \
     cdmx-personalize.service cdmx-first-boot.service cdmx-network.service cdmx-network-portal.service \
-    cdmx-usb-rescue.service cdmx-desktop.service cdmx-novnc.service
+    cdmx-network-monitor.service cdmx-usb-rescue.service cdmx-desktop.service cdmx-novnc.service
 if [[ -f /etc/systemd/system/cdmx-picoclaw.service ]]; then
     systemctl enable cdmx-picoclaw.service
 fi

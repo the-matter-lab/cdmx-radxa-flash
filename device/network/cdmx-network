@@ -1,8 +1,12 @@
 #!/bin/sh
 set -eu
 
-config=/etc/cdmx/workshop.conf
-ap_password_file=/etc/cdmx/ap-password
+config=${CDMX_NETWORK_CONFIG:-/etc/cdmx/workshop.conf}
+ap_password_file=${CDMX_AP_PASSWORD_FILE:-/etc/cdmx/ap-password}
+venue_wait=${CDMX_NETWORK_VENUE_WAIT:-35}
+monitor_interval=${CDMX_NETWORK_MONITOR_INTERVAL:-15}
+fallback_delay=${CDMX_NETWORK_FALLBACK_DELAY:-60}
+monitor_max_cycles=${CDMX_NETWORK_MONITOR_MAX_CYCLES:-0}
 
 fail() {
     printf 'cdmx-network: %s\n' "$*" >&2
@@ -30,6 +34,21 @@ validate_config() {
         *) fail "OPEN_ACCESS must be 0 or 1" ;;
     esac
     AP_ADDRESS="10.42.${NETWORK_INDEX}.1/24"
+}
+
+validate_timing() {
+    case "$venue_wait" in
+        ''|*[!0-9]*) fail "CDMX_NETWORK_VENUE_WAIT must be a non-negative integer" ;;
+    esac
+    case "$monitor_interval" in
+        ''|0|*[!0-9]*) fail "CDMX_NETWORK_MONITOR_INTERVAL must be a positive integer" ;;
+    esac
+    case "$fallback_delay" in
+        ''|*[!0-9]*) fail "CDMX_NETWORK_FALLBACK_DELAY must be a non-negative integer" ;;
+    esac
+    case "$monitor_max_cycles" in
+        ''|*[!0-9]*) fail "CDMX_NETWORK_MONITOR_MAX_CYCLES must be a non-negative integer" ;;
+    esac
 }
 
 wifi_interface() {
@@ -93,8 +112,50 @@ try_venue() {
     validate_config
     nmcli connection show cdmx-venue >/dev/null 2>&1 || return 1
     nmcli connection down cdmx-setup >/dev/null 2>&1 || true
-    nmcli --wait 35 connection up cdmx-venue >/dev/null 2>&1 || return 1
+    nmcli --wait "$venue_wait" connection up cdmx-venue >/dev/null 2>&1 || return 1
     connection_active cdmx-venue
+}
+
+monitor_network() {
+    validate_config
+    validate_timing
+    lost_at=
+    cycles=0
+
+    while :; do
+        if ! nmcli general status >/dev/null 2>&1; then
+            printf 'NetworkManager is unavailable; waiting before recovery.\n' >&2
+        elif connection_active cdmx-venue; then
+            if [ -n "$lost_at" ]; then
+                printf 'Saved venue Wi-Fi reconnected.\n'
+            fi
+            lost_at=
+        elif connection_active cdmx-setup; then
+            # Keep the onboarding network stable until the participant submits
+            # new credentials in the captive portal.
+            lost_at=
+        elif ! nmcli connection show cdmx-venue >/dev/null 2>&1; then
+            printf 'No saved venue Wi-Fi; restoring the setup hotspot.\n'
+            start_ap
+            lost_at=
+        else
+            now=$(date +%s)
+            if [ -z "$lost_at" ]; then
+                lost_at=$now
+                printf 'Saved venue Wi-Fi is offline; allowing %ss for automatic reconnection.\n' "$fallback_delay"
+            elif [ $((now - lost_at)) -ge "$fallback_delay" ]; then
+                printf 'Saved venue Wi-Fi did not recover; restoring the setup hotspot.\n'
+                start_ap
+                lost_at=
+            fi
+        fi
+
+        cycles=$((cycles + 1))
+        if [ "$monitor_max_cycles" -gt 0 ] && [ "$cycles" -ge "$monitor_max_cycles" ]; then
+            break
+        fi
+        sleep "$monitor_interval"
+    done
 }
 
 reset_network() {
@@ -120,7 +181,8 @@ case "${1:-boot}" in
         ;;
     ap) start_ap ;;
     venue) try_venue || fail "saved venue Wi-Fi unavailable" ;;
+    monitor) monitor_network ;;
     reset) reset_network ;;
     status) status ;;
-    *) fail "usage: cdmx-network {boot|ap|venue|reset|status}" ;;
+    *) fail "usage: cdmx-network {boot|ap|venue|monitor|reset|status}" ;;
 esac

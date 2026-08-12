@@ -1,0 +1,26 @@
+[Unit]
+Description=CDMX Wi-Fi recovery and setup hotspot monitor
+After=cdmx-network.service NetworkManager.service cdmx-network-portal.service
+Requires=cdmx-network.service
+Wants=NetworkManager.service cdmx-network-portal.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/cdmx-network monitor
+Restart=always
+RestartSec=5
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictRealtime=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+MemoryMax=64M
+
+[Install]
+WantedBy=multi-user.target

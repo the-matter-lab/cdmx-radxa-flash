@@ -58,6 +58,8 @@ tarjeta. Nunca las agregue a la imagen local ni al repositorio.
    enlace de solo lectura.
 6. Tenga preparadas dos tarjetas SD de repuesto ya grabadas y al menos una
    placa Radxa y una fuente de alimentación de repuesto.
+7. Apague temporalmente el Wi‑Fi guardado en una placa de prueba y confirme que
+   su red `-setup` reaparece en aproximadamente 60–75 segundos.
 
 ## Comandos de recuperación
 
@@ -66,6 +68,6 @@ sudo cdmx-network status
 sudo cdmx-network reset
 sudo systemctl restart cdmx-desktop cdmx-novnc
 sudo systemctl restart cdmx-picoclaw
-sudo journalctl -u cdmx-network -u cdmx-picoclaw -n 100 --no-pager
+sudo journalctl -u cdmx-network -u cdmx-network-monitor -u cdmx-picoclaw -n 100 --no-pager
 sudo reboot
 ```

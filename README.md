@@ -82,6 +82,11 @@ admin:   http://10.42.10.1:8080/
 Después de guardar el Wi‑Fi, vuelva a conectar la laptop o el teléfono a esa
 misma LAN:
 
+Si la red guardada deja de estar disponible, la placa intenta reconectarse y,
+tras aproximadamente 60–75 segundos sin conexión, vuelve a publicar
+`equipoN-setup` (o `admin-setup`). Conéctese otra vez a esa red para introducir
+un SSID y una contraseña nuevos; no hace falta volver a grabar la tarjeta.
+
 | Propósito | Dirección |
 |---|---|
 | Control noVNC | `http://equipoN.local:6080/control.html` |
