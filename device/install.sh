@@ -53,13 +53,9 @@ fi
 case "$team" in
     0|1|2|3|4|5|6|7|8|9)
         device_hostname="equipo$team"; network_index=$team
-        desktop_memory_high=256M; desktop_memory_max=320M
-        agent_memory_high=192M; agent_memory_max=256M
         ;;
     admin)
         device_hostname='admin'; network_index=10
-        desktop_memory_high=384M; desktop_memory_max=512M
-        agent_memory_high=384M; agent_memory_max=512M
         ;;
     *) printf '%s\n' '--team must be 0-9 or admin' >&2; exit 64 ;;
 esac
@@ -283,6 +279,7 @@ install -d -m 0755 /usr/local/share/cdmx
 install -m 0644 /opt/cdmx-radxa-flash/device/network/matter-lab-logo.svg /usr/local/share/cdmx/matter-lab-logo.svg
 install -m 0755 /opt/cdmx-radxa-flash/device/network/usb_rescue.sh /usr/local/lib/cdmx/usb_rescue.sh
 install -m 0755 /opt/cdmx-radxa-flash/device/personalize.sh /usr/local/sbin/cdmx-personalize
+install -m 0755 /opt/cdmx-radxa-flash/device/apply-resource-limits.sh /usr/local/sbin/cdmx-apply-resource-limits
 install -m 0755 /opt/cdmx-radxa-flash/device/configure-firewall.sh /usr/local/sbin/cdmx-configure-firewall
 install -m 0755 /opt/cdmx-radxa-flash/device/first-boot.sh /usr/local/sbin/cdmx-first-boot
 
@@ -376,24 +373,12 @@ if [[ -f /etc/systemd/system/cdmx-picoclaw.service ]]; then
     systemctl enable cdmx-picoclaw.service
 fi
 
-# Keep one misbehaving graphical app or agent from exhausting a 1 GB team
-# board. The admin image has 2 GB and receives proportionally larger ceilings.
-install -d -m 0755 /etc/systemd/system/cdmx-desktop.service.d \
-    /etc/systemd/system/cdmx-picoclaw.service.d
-cat > /etc/systemd/system/cdmx-desktop.service.d/20-memory.conf <<EOF
-[Service]
-MemoryHigh=$desktop_memory_high
-MemoryMax=$desktop_memory_max
-TasksMax=192
-EOF
-cat > /etc/systemd/system/cdmx-picoclaw.service.d/20-memory.conf <<EOF
-[Service]
-MemoryHigh=$agent_memory_high
-MemoryMax=$agent_memory_max
-TasksMax=128
-EOF
-if ! $offline_image; then
-    systemctl daemon-reload
+# The golden image starts as admin, then cdmx-personalize reapplies the tighter
+# profile when the flasher assigns equipo0-equipo9 to a 1 GB workshop board.
+if $offline_image; then
+    CDMX_OFFLINE_IMAGE=1 /usr/local/sbin/cdmx-apply-resource-limits "$team"
+else
+    /usr/local/sbin/cdmx-apply-resource-limits "$team"
 fi
 
 chown -R "$workshop_user:$workshop_user" "/home/$workshop_user/.pi" "/home/$workshop_user/.picoclaw"

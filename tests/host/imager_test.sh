@@ -67,6 +67,22 @@ else
   printf 'ok - workshop services do not require a shared local password\n'
 fi
 assert_eq OPEN_ACCESS=1 "$(grep '^OPEN_ACCESS=' "$ROOT/device/personalize.sh")" 'clones keep the passwordless setup AP'
+limits_root="$tmp/limits"
+CDMX_ROOT="$limits_root" "$ROOT/device/apply-resource-limits.sh" 0
+assert_eq MemoryHigh=256M \
+  "$(grep '^MemoryHigh=' "$limits_root/etc/systemd/system/cdmx-desktop.service.d/20-memory.conf")" \
+  '1 GB team cards receive the lightweight desktop memory profile'
+assert_eq MemoryMax=256M \
+  "$(grep '^MemoryMax=' "$limits_root/etc/systemd/system/cdmx-picoclaw.service.d/20-memory.conf")" \
+  '1 GB team cards receive the lightweight agent memory profile'
+CDMX_ROOT="$limits_root" "$ROOT/device/apply-resource-limits.sh" admin
+assert_eq MemoryMax=512M \
+  "$(grep '^MemoryMax=' "$limits_root/etc/systemd/system/cdmx-desktop.service.d/20-memory.conf")" \
+  '2 GB admin receives the larger desktop memory profile'
+assert_eq 1 "$(grep -c 'cdmx-apply-resource-limits \"\$team\"' "$ROOT/device/personalize.sh")" \
+  'first-boot personalization reapplies limits for the assigned board'
+assert_fails 'resource limits reject an unknown team' env CDMX_ROOT="$limits_root" \
+  "$ROOT/device/apply-resource-limits.sh" 10
 assert_eq RuntimeDirectory=cdmx "$(grep '^RuntimeDirectory=' "$ROOT/device/systemd/cdmx-network-portal.service")" 'portal runtime directory exists before sandboxing'
 assert_eq 1 "$(grep -c 'cdmx-network-monitor.service' "$ROOT/device/install.sh")" \
   'image enables the runtime Wi-Fi recovery monitor'

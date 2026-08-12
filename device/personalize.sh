@@ -27,7 +27,7 @@ team=$(awk -F= '$1 == "CDMX_TEAM" {print $2; exit}' "$marker")
 requested_hostname=$(awk -F= '$1 == "CDMX_HOSTNAME" {print $2; exit}' "$marker")
 case "$team" in
     0|1|2|3|4|5|6|7|8|9) hostname="equipo$team"; network_index=$team ;;
-    admin) hostname=admin; network_index=10 ;;
+    admin) hostname='admin'; network_index=10 ;;
     *) printf 'Invalid CDMX_TEAM marker.\n' >&2; exit 65 ;;
 esac
 [[ $requested_hostname == "$hostname" ]] || { printf 'Hostname marker does not match team.\n' >&2; exit 65; }
@@ -49,6 +49,7 @@ address=/#/10.42.$network_index.1
 dhcp-option-force=114,http://10.42.$network_index.1:8080/captive-api
 EOF
 chmod 0644 /etc/NetworkManager/dnsmasq-shared.d/10-cdmx-captive.conf
+/usr/local/sbin/cdmx-apply-resource-limits "$team"
 printf '%s\n' "$hostname" > /etc/hostname
 hostname "$hostname"
 cat > /etc/hosts <<EOF
