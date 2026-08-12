@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import argparse
 import importlib.util
 import http.client
 from pathlib import Path
+import struct
 import tempfile
 import threading
 import unittest
+from unittest import mock
 
 
 MODULE_PATH = Path(__file__).parents[1] / "host" / "imager_app.py"
@@ -54,15 +57,20 @@ class ImagerTests(unittest.TestCase):
         self.assertEqual(imager.validate_team("admin"), "admin")
         self.assertEqual(imager.identity_name("admin"), "admin")
         self.assertEqual(imager.identity_name(4), "equipo4")
+        self.assertEqual(imager.parse_cli_team("0"), 0)
+        self.assertEqual(imager.parse_cli_team("admin"), "admin")
         for invalid in (-1, 10, "0", True, None):
             with self.assertRaises(ValueError):
                 imager.validate_team(invalid)
+        with self.assertRaises(argparse.ArgumentTypeError):
+            imager.parse_cli_team("equipo0")
 
     def test_raw_disk_path_has_no_shell_escapes(self):
         original = imager.HOST_SYSTEM
         try:
             imager.HOST_SYSTEM = "Darwin"
             self.assertEqual(imager.raw_disk_path("/dev/disk10"), "/dev/rdisk10")
+            self.assertEqual(imager.provisioning_disk_path("/dev/disk10"), "/dev/disk10")
             with self.assertRaises(ValueError):
                 imager.raw_disk_path("/dev/disk10s1")
             imager.HOST_SYSTEM = "Windows"
@@ -71,6 +79,40 @@ class ImagerTests(unittest.TestCase):
                 imager.raw_disk_path(r"C:\\")
         finally:
             imager.HOST_SYSTEM = original
+
+    def test_gpt_parser_uses_sector_aligned_reads(self):
+        image = bytearray(3 * 512)
+        header = memoryview(image)[512:1024]
+        header[:8] = b"EFI PART"
+        struct.pack_into("<Q", header, 72, 2)
+        struct.pack_into("<I", header, 80, 4)
+        struct.pack_into("<I", header, 84, 128)
+        image[1024:1040] = b"\x01" * 16
+        struct.pack_into("<QQ", image, 1024 + 32, 2048, 4095)
+
+        class SectorAlignedDevice:
+            def __init__(self, payload):
+                self.payload = payload
+                self.position = 0
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+            def seek(self, offset):
+                self.position = offset
+
+            def read(self, size):
+                if self.position % 512 or size % 512:
+                    raise OSError(22, "Invalid argument")
+                result = self.payload[self.position : self.position + size]
+                self.position += len(result)
+                return bytes(result)
+
+        with mock.patch("builtins.open", return_value=SectorAlignedDevice(image)):
+            self.assertEqual(imager.gpt_partition_offsets("/dev/rdisk10"), [(1_048_576, 1_048_576)])
 
     def test_builtin_sd_reader_is_safe_but_fixed_disk_is_not(self):
         sd = imager.parse_diskutil_info(REMOVABLE_SD)

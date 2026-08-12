@@ -247,6 +247,16 @@ def raw_disk_path(disk: str) -> str:
     return disk
 
 
+def provisioning_disk_path(disk: str) -> str:
+    """Return a device that permits the small, unaligned FAT metadata writes."""
+    if not valid_disk_identifier(disk):
+        raise ValueError("invalid whole-disk identifier")
+    # macOS raw character devices (/dev/rdiskN) require sector-aligned I/O.
+    # PyFatFS performs small directory-entry reads and writes, so provisioning
+    # uses the buffered block device after the fast bulk transfer has finished.
+    return disk
+
+
 def windows_disk_number(disk: str) -> int:
     match = WINDOWS_DISK_PATTERN.fullmatch(disk)
     if not match:
@@ -271,6 +281,15 @@ def validate_team(team: object) -> int | str:
     if isinstance(team, bool) or not isinstance(team, int) or team not in range(10):
         raise ValueError("identity must be admin or an integer from 0 through 9")
     return team
+
+
+def parse_cli_team(value: str) -> int | str:
+    if value == "admin":
+        return value
+    try:
+        return validate_team(int(value))
+    except (TypeError, ValueError) as exc:
+        raise argparse.ArgumentTypeError("team must be 0 through 9 or admin") from exc
 
 
 def identity_name(identity: object) -> str:
@@ -577,11 +596,15 @@ def gpt_partition_offsets(raw_disk: str) -> list[tuple[int, int]]:
         if not (1 <= entry_count <= 1024 and 128 <= entry_size <= 1024):
             raise ValueError("written image has invalid GPT entries")
         source.seek(entry_lba * sector_size)
+        table_bytes = entry_count * entry_size
+        aligned_bytes = ((table_bytes + sector_size - 1) // sector_size) * sector_size
+        table = source.read(aligned_bytes)
+        if len(table) < table_bytes:
+            raise ValueError("written image has a truncated GPT")
         offsets: list[tuple[int, int]] = []
-        for _ in range(entry_count):
-            entry = source.read(entry_size)
-            if len(entry) != entry_size:
-                raise ValueError("written image has a truncated GPT")
+        for index in range(entry_count):
+            start = index * entry_size
+            entry = table[start : start + entry_size]
             if entry[:16] == bytes(16):
                 continue
             first_lba, last_lba = struct.unpack_from("<QQ", entry, 32)
@@ -641,6 +664,14 @@ def eject_disk(disk: str) -> None:
             command(["udisksctl", "power-off", "-b", disk], check=False)
 
 
+def provision_existing_card(disk: str, team: int | str) -> None:
+    """Assign an identity after a completed image write/read-back cycle."""
+    ensure_disk(disk)
+    prepare_disk_for_write(disk)
+    provision_identity(provisioning_disk_path(disk), validate_team(team))
+    eject_disk(disk)
+
+
 def is_administrator() -> bool:
     if HOST_SYSTEM == "Windows":
         return bool(ctypes.windll.shell32.IsUserAnAdmin())  # type: ignore[attr-defined]
@@ -681,7 +712,8 @@ def flash_job(disk: str, team: int | str) -> None:
             verify_image(raw, total, source_sha)
             STATE.log("Read-back checksum passed")
             STATE.update(phase="provision", label=f"Assigning {identity_name(team)}", progress=98.5)
-            provision_identity(raw, team)
+            prepare_disk_for_write(disk)
+            provision_identity(provisioning_disk_path(disk), team)
             STATE.log(f"Assigned {identity_name(team)}")
             STATE.update(phase="eject", label="Finishing safely", progress=99.5)
             eject_disk(disk)
@@ -847,10 +879,22 @@ def main() -> int:
     parser.add_argument("--manifest", default=os.environ.get("CDMX_MANIFEST_URL", DEFAULT_MANIFEST_URL))
     parser.add_argument("--image", help="Use a local image that matches the manifest checksum")
     parser.add_argument("--no-browser", action="store_true")
+    parser.add_argument("--provision-only", metavar="DISK", help="Finish identity assignment on an already verified card")
+    parser.add_argument("--team", type=parse_cli_team, help="Identity for --provision-only: 0 through 9 or admin")
     args = parser.parse_args()
     if not is_administrator():
         print("Start this helper as Administrator so it can access the removable SD card.")
         return 77
+    if bool(args.provision_only) != (args.team is not None):
+        parser.error("--provision-only and --team must be used together")
+    if args.provision_only:
+        try:
+            provision_existing_card(args.provision_only, args.team)
+        except Exception as exc:
+            print(f"Could not assign the card identity: {exc}")
+            return 74
+        print(f"Assigned {identity_name(args.team)}; the SD card is verified and safe to remove.")
+        return 0
     try:
         initialize_runtime(args.manifest, args.image)
     except Exception as exc:
