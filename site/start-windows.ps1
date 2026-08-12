@@ -74,9 +74,16 @@ if (-not (Test-Path $VenvPython)) {
 try {
     $Existing = Invoke-WebRequest -UseBasicParsing -MaximumRedirection 0 -Uri "http://127.0.0.1:8766/" -ErrorAction Stop
     if ($Existing.StatusCode -eq 302) {
-        Start-Process $PublicSite
-        Write-Host "El lector ya está abierto."
-        exit 0
+        $CurrentHelper = Get-CimInstance Win32_Process | Where-Object {
+            $_.Name -in @("python.exe", "pythonw.exe") -and
+            $_.CommandLine -like "*$SourceDir*host\imager_app.py*"
+        }
+        if ($CurrentHelper) {
+            Start-Process $PublicSite
+            Write-Host "El lector ya está abierto."
+            exit 0
+        }
+        throw "Hay una versión anterior del lector abierta."
     }
 }
 catch {

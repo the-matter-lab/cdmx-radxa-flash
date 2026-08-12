@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import http.client
 from pathlib import Path
@@ -169,6 +170,81 @@ class ImagerTests(unittest.TestCase):
         manifest["image"]["url"] = "http://example.test/image.img.xz"
         with self.assertRaises(ValueError):
             imager.validate_manifest(manifest)
+
+    def test_stale_legacy_cache_is_removed_and_redownloaded(self):
+        payload = b"current image"
+        digest = hashlib.sha512(payload).hexdigest()
+        manifest = {
+            "schema": 1,
+            "version": "current",
+            "image": {
+                "filename": "workshop.img.xz",
+                "url": "https://example.test/workshop-current.img.xz",
+                "sha512": digest,
+                "compressed_bytes": len(payload),
+                "uncompressed_bytes": 8_000_000_000,
+            },
+        }
+        previous_runtime = dict(imager.RUNTIME)
+        try:
+            with tempfile.TemporaryDirectory() as temporary:
+                cache = Path(temporary)
+                legacy = cache / "workshop.img.xz"
+                legacy.write_bytes(b"previous image")
+                Path(str(legacy) + ".sha512").write_text(f"{'0' * 128}  {legacy.name}\n")
+
+                def fake_download(_image, destination):
+                    self.assertFalse(legacy.exists())
+                    destination.write_bytes(payload)
+
+                imager.RUNTIME.clear()
+                imager.RUNTIME["manifest"] = manifest
+                with (
+                    mock.patch.object(imager, "cache_directory", return_value=cache),
+                    mock.patch.object(imager, "download_image", side_effect=fake_download) as download,
+                ):
+                    path, _ = imager.prepare_image()
+                self.assertEqual(path.name, f"{digest[:16]}-workshop.img.xz")
+                self.assertEqual(path.read_bytes(), payload)
+                self.assertFalse(legacy.exists())
+                download.assert_called_once()
+        finally:
+            imager.RUNTIME.clear()
+            imager.RUNTIME.update(previous_runtime)
+
+    def test_corrupt_versioned_cache_self_heals(self):
+        payload = b"current image"
+        digest = hashlib.sha512(payload).hexdigest()
+        image = {
+            "filename": "workshop.img.xz",
+            "url": "https://example.test/workshop-current.img.xz",
+            "sha512": digest,
+            "compressed_bytes": len(payload),
+            "uncompressed_bytes": 8_000_000_000,
+        }
+        previous_runtime = dict(imager.RUNTIME)
+        try:
+            with tempfile.TemporaryDirectory() as temporary:
+                cache = Path(temporary)
+                cached = cache / f"{digest[:16]}-workshop.img.xz"
+                cached.write_bytes(b"broken image!")
+
+                def fake_download(_image, destination):
+                    self.assertFalse(destination.exists())
+                    destination.write_bytes(payload)
+
+                imager.RUNTIME.clear()
+                imager.RUNTIME["manifest"] = {"schema": 1, "version": "current", "image": image}
+                with (
+                    mock.patch.object(imager, "cache_directory", return_value=cache),
+                    mock.patch.object(imager, "download_image", side_effect=fake_download) as download,
+                ):
+                    path, _ = imager.prepare_image()
+                self.assertEqual(path.read_bytes(), payload)
+                download.assert_called_once()
+        finally:
+            imager.RUNTIME.clear()
+            imager.RUNTIME.update(previous_runtime)
 
     def test_ui_has_all_teams_and_progress_semantics(self):
         public_html = (MODULE_PATH.parents[1] / "site" / "index.html").read_text(encoding="utf-8")

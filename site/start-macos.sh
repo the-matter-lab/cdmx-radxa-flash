@@ -12,6 +12,7 @@ LAUNCHER="${SOURCE_DIR}/host/start-imager.command"
 PORT=${CDMX_IMAGER_PORT:-8766}
 PUBLIC_SITE=https://cdmx-radxaflash.mantilla.ca/
 PROCESS_PATTERN='CDMXRadxaFlash/source-[0-9a-f]+/host/imager_app\.py'
+CURRENT_PROCESS_PATTERN="CDMXRadxaFlash/source-${SOURCE_COMMIT}/host/imager_app\.py"
 WORK_DIR=
 
 die() {
@@ -72,12 +73,12 @@ WORK_DIR=
 trap - EXIT
 
 root_status=$(/usr/bin/curl --silent --output /dev/null --write-out '%{http_code}' "http://127.0.0.1:${PORT}/" || true)
-if [[ $root_status == 302 ]]; then
+if [[ $root_status == 302 ]] && /usr/bin/pgrep -f "$CURRENT_PROCESS_PATTERN" >/dev/null 2>&1; then
   open_public_site
   printf 'El lector ya está abierto.\n'
   exit 0
 fi
-if /usr/bin/curl --fail --silent "http://127.0.0.1:${PORT}/api/state" >/dev/null 2>&1; then
+if [[ $root_status == 302 ]] || /usr/bin/curl --fail --silent "http://127.0.0.1:${PORT}/api/state" >/dev/null 2>&1; then
   printf 'Actualizando el lector anterior…\n'
   sudo /usr/bin/pkill -TERM -f "$PROCESS_PATTERN" || true
   /bin/sleep 1

@@ -10,6 +10,8 @@ LAUNCHER="${SOURCE_DIR}/host/imager_app.py"
 VENV="${SOURCE_DIR}/.venv-imager"
 PUBLIC_SITE=https://cdmx-radxaflash.mantilla.ca/
 PORT=${CDMX_IMAGER_PORT:-8766}
+PROCESS_PATTERN='cdmx-radxa-flash/source-[0-9a-f]+/host/imager_app\.py'
+CURRENT_PROCESS_PATTERN="cdmx-radxa-flash/source-${SOURCE_COMMIT}/host/imager_app\.py"
 WORK_DIR=
 
 die() {
@@ -73,14 +75,14 @@ fi
 "$VENV/bin/python" -m pip install --disable-pip-version-check -q -r "$SOURCE_DIR/host/requirements.txt"
 
 root_status=$(curl --silent --output /dev/null --write-out '%{http_code}' "http://127.0.0.1:${PORT}/" || true)
-if [[ $root_status == 302 ]]; then
+if [[ $root_status == 302 ]] && pgrep -f "$CURRENT_PROCESS_PATTERN" >/dev/null 2>&1; then
   open_public_site
   printf 'El lector ya está abierto.\n'
   exit 0
 fi
-if curl --fail --silent "http://127.0.0.1:${PORT}/api/state" >/dev/null 2>&1; then
+if [[ $root_status == 302 ]] || curl --fail --silent "http://127.0.0.1:${PORT}/api/state" >/dev/null 2>&1; then
   printf 'Actualizando el lector anterior…\n'
-  sudo pkill -TERM -f 'cdmx-radxa-flash/source-[0-9a-f]+/host/imager_app\.py' || true
+  sudo pkill -TERM -f "$PROCESS_PATTERN" || true
   sleep 1
 fi
 
