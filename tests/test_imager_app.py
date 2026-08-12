@@ -147,6 +147,11 @@ class ImagerTests(unittest.TestCase):
         self.assertIn('data-platform="windows"', public_html)
         self.assertIn('data-platform="linux"', public_html)
         self.assertIn("Ver script para", public_html)
+        self.assertIn("Desinstalar", public_html)
+        self.assertIn("Copiar desinstalador", public_html)
+        self.assertIn("uninstall-macos.sh", public_html)
+        self.assertIn("uninstall-windows.ps1", public_html)
+        self.assertIn("uninstall-linux.sh", public_html)
         self.assertNotIn('id="mac"', public_html)
         self.assertIn(imager.PUBLIC_SITE_URL, (MODULE_PATH.parents[1] / "host" / "start-imager.command").read_text())
 
@@ -165,6 +170,20 @@ class ImagerTests(unittest.TestCase):
         self.assertIn('$SourceCommit = "9ba4ea0a9d18f1f25c36753a9c418b6a9db503a6"', windows_launcher)
         self.assertIn("Get-FileHash -Algorithm SHA256", windows_launcher)
         self.assertIn("WindowsBuiltInRole]::Administrator", windows_launcher)
+
+        mac_uninstaller = (MODULE_PATH.parents[1] / "site" / "uninstall-macos.sh").read_text(encoding="utf-8")
+        self.assertIn("/var/root/Library/Caches/CDMXRadxaFlash", mac_uninstaller)
+        self.assertIn('APP_DIR="${HOME}/Library/Application Support/CDMXRadxaFlash"', mac_uninstaller)
+        self.assertIn("No se modificó ninguna tarjeta SD", mac_uninstaller)
+
+        linux_uninstaller = (MODULE_PATH.parents[1] / "site" / "uninstall-linux.sh").read_text(encoding="utf-8")
+        self.assertIn("/root/.cache/cdmx-radxa-flash", linux_uninstaller)
+        self.assertIn("No se modificó ninguna tarjeta SD", linux_uninstaller)
+
+        windows_uninstaller = (MODULE_PATH.parents[1] / "site" / "uninstall-windows.ps1").read_text(encoding="utf-8")
+        self.assertIn('Join-Path $env:LOCALAPPDATA "CDMXRadxaFlash"', windows_uninstaller)
+        self.assertIn("Get-CimInstance Win32_Process", windows_uninstaller)
+        self.assertIn("No se modificó ninguna tarjeta SD", windows_uninstaller)
 
     def test_job_reservation_is_atomic(self):
         state = imager.JobState()

@@ -15,5 +15,10 @@
     "macos_terminal": "https://cdmx-radxaflash.mantilla.ca/start-macos.sh",
     "windows_powershell": "https://cdmx-radxaflash.mantilla.ca/start-windows.ps1",
     "linux_terminal": "https://cdmx-radxaflash.mantilla.ca/start-linux.sh"
+  },
+  "uninstallers": {
+    "macos_terminal": "https://cdmx-radxaflash.mantilla.ca/uninstall-macos.sh",
+    "windows_powershell": "https://cdmx-radxaflash.mantilla.ca/uninstall-windows.ps1",
+    "linux_terminal": "https://cdmx-radxaflash.mantilla.ca/uninstall-linux.sh"
   }
 }

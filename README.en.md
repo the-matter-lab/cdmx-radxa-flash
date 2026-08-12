@@ -48,6 +48,10 @@ nor written to the Radxa.
 On Windows, open PowerShell as Administrator and copy the command shown on the
 site. The “View script” links expose all three launchers for inspection.
 
+To remove the helper, choose the operating system and press **Uninstall** on the
+same page. Copy the displayed command: it stops only the CDMX helper and removes
+its source, Python environment, and cached image. It does not modify SD cards.
+
 The launcher creates a local Python environment, installs the pinned FAT writer,
 and asks for one administrator authorization. The existing
 `host/flash-team.sh` CLI is also available.

@@ -48,6 +48,10 @@ acceso al disco extraíble: no se guarda ni se escribe en la Radxa.
 En Windows, abra PowerShell como administrador y copie el comando que muestra
 la web. Los enlaces “Ver script” permiten inspeccionar los tres lanzadores.
 
+Para quitar el lector, elija el sistema operativo y presione **Desinstalar** en
+la misma web. Copie el comando mostrado: detiene únicamente el ayudante CDMX y
+elimina su código, entorno Python e imagen en caché. No modifica tarjetas SD.
+
 El lanzador crea un entorno Python local, instala el escritor FAT fijado y pide
 una sola autorización de administrador. También se puede usar la línea de
 comandos existente con `host/flash-team.sh`.

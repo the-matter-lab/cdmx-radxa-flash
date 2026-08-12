@@ -19,6 +19,10 @@ La interfaz está en `http://127.0.0.1:8766/`; no acepta conexiones desde la LAN
 La web pública solo distribuye el ayudante y metadatos, y nunca recibe acceso al
 disco local.
 
+La acción **Desinstalar** de la web muestra un comando por sistema operativo.
+Elimina el código descargado, `.venv-imager` y la imagen en caché, y detiene
+solo el proceso `imager_app.py` instalado por este lector. No toca las SD.
+
 ## Desde el código fuente en macOS
 
 Abra `host/start-imager.command`. La primera ejecución crea `.venv-imager` e

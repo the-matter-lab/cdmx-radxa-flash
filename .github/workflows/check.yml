@@ -20,6 +20,6 @@ jobs:
       - run: make test
       - name: Validate Windows launcher syntax
         shell: pwsh
-        run: "[scriptblock]::Create((Get-Content site/start-windows.ps1 -Raw)) | Out-Null"
+        run: "Get-ChildItem site/*.ps1 | ForEach-Object { [scriptblock]::Create((Get-Content $_ -Raw)) | Out-Null }"
       - run: pyinstaller --clean --noconfirm host/cdmx_imager.spec
       - run: test -x dist/CDMX-Radxa-Flasher
