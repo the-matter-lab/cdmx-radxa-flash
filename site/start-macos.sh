@@ -24,6 +24,18 @@ cleanup() {
     /bin/rm -rf -- "$WORK_DIR"
   fi
 }
+
+open_public_site() {
+  local app
+  for app in "Google Chrome" Chromium "Microsoft Edge"; do
+    if /usr/bin/open -Ra "$app" >/dev/null 2>&1; then
+      /usr/bin/open -a "$app" "$PUBLIC_SITE"
+      return
+    fi
+  done
+  printf 'Chrome, Chromium, o Edge es necesario para conectar la web con el lector.\n' >&2
+  /usr/bin/open "$PUBLIC_SITE"
+}
 trap cleanup EXIT
 
 [[ $(/usr/bin/uname -s) == Darwin ]] || die 'este comando es solo para macOS'
@@ -61,7 +73,7 @@ trap - EXIT
 
 root_status=$(/usr/bin/curl --silent --output /dev/null --write-out '%{http_code}' "http://127.0.0.1:${PORT}/" || true)
 if [[ $root_status == 302 ]]; then
-  /usr/bin/open "$PUBLIC_SITE"
+  open_public_site
   printf 'El lector ya está abierto.\n'
   exit 0
 fi

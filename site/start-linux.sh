@@ -22,6 +22,17 @@ cleanup() {
     rm -rf -- "$WORK_DIR"
   fi
 }
+
+open_public_site() {
+  local browser
+  for browser in google-chrome chromium chromium-browser microsoft-edge; do
+    if command -v "$browser" >/dev/null 2>&1; then
+      "$browser" "$PUBLIC_SITE" >/dev/null 2>&1 &
+      return
+    fi
+  done
+  command -v xdg-open >/dev/null 2>&1 && xdg-open "$PUBLIC_SITE" >/dev/null 2>&1 || true
+}
 trap cleanup EXIT
 
 [[ $(uname -s) == Linux ]] || die 'este comando es solo para Linux'
@@ -63,7 +74,7 @@ fi
 
 root_status=$(curl --silent --output /dev/null --write-out '%{http_code}' "http://127.0.0.1:${PORT}/" || true)
 if [[ $root_status == 302 ]]; then
-  command -v xdg-open >/dev/null 2>&1 && xdg-open "$PUBLIC_SITE" >/dev/null 2>&1 || true
+  open_public_site
   printf 'El lector ya está abierto.\n'
   exit 0
 fi
@@ -76,7 +87,7 @@ fi
 (
   for _ in {1..60}; do
     if curl --fail --silent "http://127.0.0.1:${PORT}/api/state" >/dev/null 2>&1; then
-      command -v xdg-open >/dev/null 2>&1 && xdg-open "$PUBLIC_SITE" >/dev/null 2>&1 || true
+      open_public_site
       exit 0
     fi
     sleep 0.5

@@ -5,6 +5,18 @@ ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 PORT=${CDMX_IMAGER_PORT:-8766}
 VENV="$ROOT/.venv-imager"
 
+open_public_site() {
+  local app
+  for app in "Google Chrome" Chromium "Microsoft Edge"; do
+    if open -Ra "$app" >/dev/null 2>&1; then
+      open -a "$app" "https://cdmx-radxaflash.mantilla.ca/"
+      return
+    fi
+  done
+  printf 'Chrome, Chromium, or Edge is required for local-disk access.\n' >&2
+  open "https://cdmx-radxaflash.mantilla.ca/"
+}
+
 printf 'CDMX Radxa Flasher\n'
 printf 'Dependencies install locally; macOS asks once for removable-disk access.\n'
 printf 'No password is stored or written to a Radxa.\n\n'
@@ -17,7 +29,7 @@ fi
 (
   for _ in {1..60}; do
     if curl --fail --silent "http://127.0.0.1:${PORT}/api/state" >/dev/null 2>&1; then
-      open "https://cdmx-radxaflash.mantilla.ca/"
+      open_public_site
       exit 0
     fi
     sleep 0.5

@@ -34,6 +34,10 @@ Solo existe una interfaz de usuario: la web pública. `127.0.0.1:8766` es el
 puente local privado y su raíz redirige a la web pública; no presenta una
 segunda pantalla de flasheo.
 
+Use Chrome, Chromium o Edge y acepte **acceso a dispositivos locales** cuando
+el navegador lo solicite. Safari bloquea la comunicación HTTPS→loopback HTTP;
+por eso el lanzador de macOS abre Chrome automáticamente.
+
 Los tres comandos descargan un snapshot de código fuente fijado por commit,
 comprueban su SHA‑256 y lo ejecutan con Python local. En macOS esto evita el
 bloqueo de Gatekeeper para aplicaciones sin firma. La contraseña solo autoriza

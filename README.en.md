@@ -34,6 +34,10 @@ There is only one user interface: the public website. `127.0.0.1:8766` is the
 private local bridge, and its root redirects to the public site instead of
 showing a second flashing screen.
 
+Use Chrome, Chromium, or Edge and allow **local device access** when prompted.
+Safari blocks HTTPS-to-loopback-HTTP communication, so the macOS launcher opens
+Chrome automatically.
+
 All three commands download source pinned to one commit, verify its SHA-256,
 and run it with local Python. On macOS this avoids Gatekeeper's unsigned-app
 block. The password only authorizes removable-disk access; it is neither stored
