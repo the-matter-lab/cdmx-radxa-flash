@@ -3,7 +3,8 @@
 ## Flujo recomendado: macOS o Windows
 
 1. Abra `https://cdmx-radxaflash.mantilla.ca`.
-2. Descargue el ayudante de la versión más reciente.
+2. En macOS copie la línea de Terminal de la página; en Windows descargue el
+   ayudante de la versión más reciente.
 3. Inserte una SD de al menos 8.08 GB.
 4. Abra el ayudante con privilegios de administrador.
 5. Seleccione el disco extraíble y `equipo0`–`equipo9` o `admin`.
@@ -52,8 +53,9 @@ El flujo CLI alternativo en macOS/Linux es:
 3. Actualice `site/manifest.json` con una versión nueva.
 4. Publique la imagen Docker con esa misma versión.
 5. Copie `site/`, la imagen y el sidecar a Lepton.
-6. Cree y empuje un tag `v*`; GitHub Actions publicará los ayudantes macOS y
-   Windows usados por los botones del sitio.
+6. Cree y empuje un tag `v*` cuando necesite publicar ayudantes empaquetados;
+   GitHub Actions construirá las versiones macOS y Windows. El flujo recomendado
+   en macOS usa `site/start-macos.sh` para evitar depender de una app sin firma.
 
 Use el mismo modelo y capacidad de tarjeta cuando sea posible. Nunca arranque
 dos tarjetas con la misma identidad en la misma red.

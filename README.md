@@ -15,12 +15,12 @@ Los participantes trabajan en dos repositorios separados:
 
 ## Flashear una tarjeta
 
-Abra **[cdmx-radxaflash.mantilla.ca](https://cdmx-radxaflash.mantilla.ca)** y
-descargue el ayudante para su sistema:
+Abra **[cdmx-radxaflash.mantilla.ca](https://cdmx-radxaflash.mantilla.ca)**:
 
 1. Inserte una tarjeta SD de al menos 8 GB.
-2. En macOS, abra `Start-CDMX-Radxa-Flasher.command` dentro del ZIP. En Windows,
-   ejecute `CDMX-Radxa-Flasher.exe` como administrador.
+2. En macOS, copie de la web la línea para Terminal, péguela y escriba la
+   contraseña de la Mac cuando `sudo` la solicite. En Windows, ejecute
+   `CDMX-Radxa-Flasher.exe` como administrador.
 3. Seleccione la unidad extraíble y `equipo0`–`equipo9` o `admin`.
 4. Confirme el borrado y espere a que la escritura **y la lectura de
    verificación** lleguen a 100%.
@@ -31,16 +31,15 @@ USB/SD extraíbles, vuelve a comprobar el destino antes de borrarlo y descarga l
 versión indicada en [`site/manifest.json`](site/manifest.json). La imagen y su
 SHA‑512 se guardan en caché para las tarjetas siguientes.
 
-Los binarios todavía no tienen firma comercial, por lo que Gatekeeper o
-SmartScreen puede pedir una confirmación adicional. El código de los binarios
-se construye públicamente en GitHub Actions desde este repositorio.
+En macOS, la línea descarga un snapshot de código fuente fijado por commit,
+comprueba su SHA‑256 y lo ejecuta con Python local. Así evita el bloqueo de
+Gatekeeper para aplicaciones sin firma. La contraseña solo autoriza acceso al
+disco extraíble: no se guarda ni se escribe en la Radxa.
 
 ### Ejecutar desde el código fuente en macOS
 
 ```bash
-git clone https://github.com/the-matter-lab/cdmx-radxa-flash.git
-cd cdmx-radxa-flash
-open host/start-imager.command
+/bin/bash -c "$(curl -fsSL https://cdmx-radxaflash.mantilla.ca/start-macos.sh)"
 ```
 
 El lanzador crea un entorno Python local, instala el escritor FAT fijado y pide
@@ -149,9 +148,9 @@ GitHub Release. El contenido de `site/` y la imagen verificada se sirven desde
 Lepton mediante Caddy y Cloudflare Tunnel. La configuración reproducible del
 sitio está en [`deploy/`](deploy/README.md).
 
-Los lectores microSD conectados por USB-A o USB-C se detectan como discos USB;
-también se aceptan cuando el adaptador declara la tarjeta como medio fijo. Los
-discos de arranque y del sistema siguen excluidos.
+El lector SD integrado de la Mac y los lectores microSD conectados por USB-A o
+USB-C son compatibles; también se aceptan adaptadores que declaran la tarjeta
+como medio fijo. Los discos de arranque y del sistema siguen excluidos.
 
 La web pública habla únicamente con el ayudante privilegiado en
 `127.0.0.1:8766`: muestra los discos extraíbles, las identidades y el progreso,

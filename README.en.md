@@ -15,12 +15,12 @@ Participants work in two separate repositories:
 
 ## Flash a card
 
-Open **[cdmx-radxaflash.mantilla.ca](https://cdmx-radxaflash.mantilla.ca)** and
-download the helper for your system:
+Open **[cdmx-radxaflash.mantilla.ca](https://cdmx-radxaflash.mantilla.ca)**:
 
 1. Insert an SD card of at least 8 GB.
-2. On macOS, open `Start-CDMX-Radxa-Flasher.command` from the ZIP. On Windows,
-   run `CDMX-Radxa-Flasher.exe` as Administrator.
+2. On macOS, copy the Terminal line from the page, paste it, and enter the
+   Mac password when `sudo` requests it. On Windows, run
+   `CDMX-Radxa-Flasher.exe` as Administrator.
 3. Select the removable drive and `equipo0`–`equipo9` or `admin`.
 4. Confirm the erase and wait for both writing **and read-back verification** to
    reach 100%.
@@ -31,16 +31,15 @@ the target before erasing, and downloads the version declared in
 [`site/manifest.json`](site/manifest.json). It caches the image and SHA-512 for
 subsequent cards.
 
-The binaries are not commercially code-signed yet, so Gatekeeper or SmartScreen
-may require an additional confirmation. GitHub Actions builds them publicly
-from this repository.
+On macOS, the command downloads source pinned to one commit, verifies its
+SHA-256, and runs it with local Python. This avoids Gatekeeper's unsigned-app
+block. The password only authorizes removable-disk access; it is neither stored
+nor written to the Radxa.
 
 ### Run from source on macOS
 
 ```bash
-git clone https://github.com/the-matter-lab/cdmx-radxa-flash.git
-cd cdmx-radxa-flash
-open host/start-imager.command
+/bin/bash -c "$(curl -fsSL https://cdmx-radxaflash.mantilla.ca/start-macos.sh)"
 ```
 
 The launcher creates a local Python environment, installs the pinned FAT writer,
@@ -146,9 +145,9 @@ GitHub Release. Lepton serves `site/` and the verified image through Caddy and
 Cloudflare Tunnel. Reproducible site configuration lives in
 [`deploy/`](deploy/README.md).
 
-microSD readers connected through USB-A or USB-C are detected as USB disks,
-including adapters that report the card as fixed media. Boot and system disks
-remain excluded.
+The Mac's built-in SD reader and microSD readers connected through USB-A or
+USB-C are supported, including adapters that report the card as fixed media.
+Boot and system disks remain excluded.
 
 The public page talks only to the privileged helper on `127.0.0.1:8766`: it
 shows removable disks, identities, and progress, while physical reads and

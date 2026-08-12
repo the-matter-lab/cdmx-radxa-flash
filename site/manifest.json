@@ -11,8 +11,10 @@
     "compressed_bytes": 1906055568,
     "uncompressed_bytes": 8074662912
   },
+  "launchers": {
+    "macos_terminal": "https://cdmx-radxaflash.mantilla.ca/start-macos.sh"
+  },
   "downloads": {
-    "macos": "https://github.com/the-matter-lab/cdmx-radxa-flash/releases/latest/download/cdmx-radxa-flash-macos.zip",
     "windows": "https://github.com/the-matter-lab/cdmx-radxa-flash/releases/latest/download/CDMX-Radxa-Flasher.exe"
   }
 }

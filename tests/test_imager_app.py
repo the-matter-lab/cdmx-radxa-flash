@@ -142,7 +142,16 @@ class ImagerTests(unittest.TestCase):
         self.assertIn("/api/flash", public_html)
         self.assertIn("IDENTITIES", public_html)
         self.assertIn("Volver a intentar", public_html)
+        self.assertIn("Copiar comando", public_html)
+        self.assertIn("lector SD integrado", public_html)
+        self.assertNotIn('id="mac"', public_html)
         self.assertIn(imager.PUBLIC_SITE_URL, (MODULE_PATH.parents[1] / "host" / "start-imager.command").read_text())
+
+        mac_launcher = (MODULE_PATH.parents[1] / "site" / "start-macos.sh").read_text(encoding="utf-8")
+        self.assertIn("SOURCE_COMMIT=9ba4ea0a9d18f1f25c36753a9c418b6a9db503a6", mac_launcher)
+        self.assertIn("ARCHIVE_SHA256=3b15ced6ce1b15591ab158ab791d119c30bce2a756e6fae58a547588789cc98e", mac_launcher)
+        self.assertIn("codeload.github.com/the-matter-lab/cdmx-radxa-flash", mac_launcher)
+        self.assertIn("shasum -a 256", mac_launcher)
 
     def test_job_reservation_is_atomic(self):
         state = imager.JobState()
