@@ -22,7 +22,7 @@ select{width:100%;margin-top:10px;padding:11px 12px;border:1px solid var(--line)
   <section class="card">
     <div class="row"><span class="label">SD card</span><span class="value" id="diskStatus">Detecting…</span></div>
     <select id="disk" aria-label="Target SD card"></select>
-    <p class="hint">Only removable whole disks are shown. The selected card will be completely erased.</p>
+    <p class="hint">microSD readers connected through USB-A or USB-C are supported. The selected card will be completely erased.</p>
   </section>
   <section class="card">
     <div class="row"><span class="label">Device identity</span><span class="value" id="goldenStatus">Checking workshop image…</span></div>
@@ -44,7 +44,7 @@ const $=id=>document.getElementById(id);const fmtBytes=n=>n?`${(n/1e9).toFixed(2
 const identityName=id=>id==='admin'?'admin':`equipo${id}`;
 function renderTeams(state){const host=$('teams');if(!host.children.length){for(const id of IDENTITIES){const b=document.createElement('button');b.className='team';b.textContent=id;b.type='button';b.dataset.identity=String(id);b.onclick=()=>{selectedTeam=id;render(state)};host.appendChild(b)}}
  [...host.children].forEach(b=>{b.classList.toggle('selected',b.dataset.identity===String(selectedTeam));b.disabled=state.running||!state.images.golden.ready});}
-function render(state){lastState=state;renderTeams(state);const disks=state.disks||[],select=$('disk'),prior=select.value;select.replaceChildren();for(const d of disks){const o=document.createElement('option');o.value=d.id;o.textContent=`${d.id} · ${d.name} · ${fmtBytes(d.size)}`;select.appendChild(o)}if(disks.some(d=>d.id===prior))select.value=prior;
+function render(state){lastState=state;renderTeams(state);const disks=state.disks||[],select=$('disk'),prior=select.value;select.replaceChildren();for(const d of disks){const o=document.createElement('option');o.value=d.id;o.textContent=`${d.id} · ${d.name} · ${fmtBytes(d.size)} · ${d.protocol}`;select.appendChild(o)}if(disks.some(d=>d.id===prior))select.value=prior;
  $('diskStatus').textContent=disks.length===1?'1 removable card':`${disks.length} removable cards`;$('goldenStatus').textContent=state.images.golden.ready?`Image ${state.images.golden.version}${state.images.golden.cached?' · cached':''}`:'Image metadata unavailable';
  $('imageHint').textContent=state.images.golden.ready?(state.images.golden.cached?'The verified image is cached. Choose equipo0–equipo9 or admin.':'The verified image downloads automatically on the first card.'):'Restart with an internet connection or a valid local manifest.';
  const canFlash=disks.length>0&&!state.running;$('teamFlash').disabled=!canFlash||!state.images.golden.ready;$('teamFlash').textContent=`Erase + flash ${identityName(selectedTeam)}`;

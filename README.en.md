@@ -137,6 +137,10 @@ GitHub Release. Lepton serves `site/` and the verified image through Caddy and
 Cloudflare Tunnel. Reproducible site configuration lives in
 [`deploy/`](deploy/README.md).
 
+microSD readers connected through USB-A or USB-C are detected as USB disks,
+including adapters that report the card as fixed media. Boot and system disks
+remain excluded.
+
 The public page talks only to the privileged helper on `127.0.0.1:8766`: it
 shows removable disks, identities, and progress, while physical reads and
 writes always happen on the laptop. The CORS bridge accepts only the Matter Lab

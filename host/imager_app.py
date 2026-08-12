@@ -39,6 +39,7 @@ MAC_DISK_PATTERN = re.compile(r"^/dev/disk[0-9]+$")
 LINUX_DISK_PATTERN = re.compile(r"^/dev/(?:sd[a-z]+|mmcblk[0-9]+)$")
 WINDOWS_DISK_PATTERN = re.compile(r"^\\\\\.\\PhysicalDrive([0-9]+)$", re.IGNORECASE)
 SHA512_PATTERN = re.compile(r"^[0-9a-f]{128}$")
+WINDOWS_SAFE_BUS_TYPES = {"USB", "SD", "MMC"}
 CHUNK_SIZE = 4 * 1024 * 1024
 RUNTIME: dict[str, object] = {}
 DISK_CACHE: tuple[float, list[dict[str, object]]] = (0.0, [])
@@ -69,10 +70,13 @@ def mac_disk_is_safe(disk: str, info: dict[str, str]) -> bool:
         return False
     if info.get("Whole") != "Yes" or mac_disk_size(info) < 4_000_000_000:
         return False
-    removable = info.get("Removable Media") in {"Yes", "Removable"}
-    external = info.get("Device Location") == "External"
-    usb = info.get("Protocol") == "USB"
-    internal = info.get("Device Location") == "Internal" or info.get("Internal") == "Yes"
+    removable = info.get("Removable Media", "").strip().lower() in {"yes", "removable"}
+    external = info.get("Device Location", "").strip().lower() == "external"
+    usb = info.get("Protocol", "").strip().lower() == "usb"
+    internal = (
+        info.get("Device Location", "").strip().lower() == "internal"
+        or info.get("Internal", "").strip().lower() == "yes"
+    )
     return not (internal and not removable) and (removable or external or usb)
 
 
@@ -117,25 +121,69 @@ def powershell(script: str, *, check: bool = True) -> subprocess.CompletedProces
     )
 
 
+def windows_disk_is_safe(item: dict[str, object]) -> bool:
+    try:
+        size = int(item.get("size") or 0)
+    except (TypeError, ValueError):
+        return False
+    bus_type = str(item.get("protocol") or "").strip().upper()
+    disk = str(item.get("id") or "")
+    return (
+        bool(WINDOWS_DISK_PATTERN.fullmatch(disk))
+        and not bool(item.get("is_boot"))
+        and not bool(item.get("is_system"))
+        and size >= 4_000_000_000
+        and bus_type in WINDOWS_SAFE_BUS_TYPES
+    )
+
+
 def list_windows_disks() -> list[dict[str, object]]:
     script = r"""
-$items = Get-Disk | Where-Object {
-  -not $_.IsBoot -and -not $_.IsSystem -and $_.Size -ge 4000000000 -and
-  @('USB','SD','MMC') -contains $_.BusType.ToString()
-} | ForEach-Object {
+$items = Get-Disk | ForEach-Object {
   [pscustomobject]@{
     id = "\\.\PhysicalDrive$($_.Number)"
     name = $_.FriendlyName
     size = [int64]$_.Size
     protocol = $_.BusType.ToString()
-    removable = $true
+    is_boot = [bool]$_.IsBoot
+    is_system = [bool]$_.IsSystem
   }
 }
 ConvertTo-Json -InputObject @($items) -Compress
 """
     output = powershell(script).stdout.strip() or "[]"
     payload = json.loads(output)
-    return [item for item in payload if isinstance(item, dict)]
+    disks: list[dict[str, object]] = []
+    for item in payload:
+        if not isinstance(item, dict) or not windows_disk_is_safe(item):
+            continue
+        disks.append(
+            {
+                "id": item.get("id"),
+                "name": item.get("name") or "USB/SD card reader",
+                "size": int(item.get("size") or 0),
+                "protocol": str(item.get("protocol") or "Unknown"),
+                "removable": True,
+            }
+        )
+    return disks
+
+
+def linux_disk_is_safe(item: dict[str, object], root_chain: set[str]) -> bool:
+    path = str(item.get("path") or "")
+    transport = str(item.get("tran") or "").strip().lower()
+    removable = item.get("rm") is True or str(item.get("rm") or "").strip().lower() in {"1", "true", "yes"}
+    try:
+        size = int(item.get("size") or 0)
+    except (TypeError, ValueError):
+        return False
+    return (
+        item.get("type") == "disk"
+        and bool(LINUX_DISK_PATTERN.fullmatch(path))
+        and size >= 4_000_000_000
+        and path not in root_chain
+        and (removable or transport in {"usb", "mmc"})
+    )
 
 
 def list_linux_disks() -> list[dict[str, object]]:
@@ -151,13 +199,7 @@ def list_linux_disks() -> list[dict[str, object]]:
         path = str(item.get("path", ""))
         transport = str(item.get("tran") or "")
         removable = bool(item.get("rm"))
-        if (
-            item.get("type") == "disk"
-            and LINUX_DISK_PATTERN.fullmatch(path)
-            and int(item.get("size") or 0) >= 4_000_000_000
-            and path not in root_chain
-            and (removable or transport in {"usb", "mmc"})
-        ):
+        if linux_disk_is_safe(item, root_chain):
             disks.append(
                 {
                     "id": path,

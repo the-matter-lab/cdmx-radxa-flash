@@ -35,6 +35,17 @@ FIXED_INTERNAL = """
    Removable Media:           Fixed
 """
 
+USB_MICROSD_ADAPTER = """
+   Device Identifier:         disk12
+   Device Node:               /dev/disk12
+   Whole:                     Yes
+   Device / Media Name:       Generic USB3.0 Card Reader
+   Protocol:                  USB
+   Disk Size:                 512.1 GB (512110190592 Bytes)
+   Device Location:           External
+   Removable Media:           Fixed
+"""
+
 
 class ImagerTests(unittest.TestCase):
     def test_team_range_and_admin_identity(self):
@@ -67,6 +78,38 @@ class ImagerTests(unittest.TestCase):
         self.assertTrue(imager.disk_is_safe("/dev/disk10", sd))
         self.assertFalse(imager.disk_is_safe("/dev/disk0", fixed))
         self.assertEqual(imager.disk_size(sd), 15_635_841_024)
+
+    def test_usb_microsd_adapter_is_safe_even_if_reported_fixed(self):
+        adapter = imager.parse_diskutil_info(USB_MICROSD_ADAPTER)
+        self.assertTrue(imager.disk_is_safe("/dev/disk12", adapter))
+        self.assertEqual(imager.disk_size(adapter), 512_110_190_592)
+
+    def test_windows_usb_adapter_is_safe_but_system_disk_is_not(self):
+        adapter = {
+            "id": r"\\.\PhysicalDrive8",
+            "name": "USB SD Reader",
+            "size": 512_110_190_592,
+            "protocol": "usb",
+            "is_boot": False,
+            "is_system": False,
+        }
+        self.assertTrue(imager.windows_disk_is_safe(adapter))
+        self.assertFalse(imager.windows_disk_is_safe(dict(adapter, is_system=True)))
+        self.assertFalse(imager.windows_disk_is_safe(dict(adapter, protocol="NVMe")))
+
+    def test_linux_usb_adapter_is_safe_even_if_not_marked_removable(self):
+        adapter = {
+            "name": "sdb",
+            "path": "/dev/sdb",
+            "size": 512_110_190_592,
+            "model": "USB SD Reader",
+            "tran": "usb",
+            "rm": False,
+            "type": "disk",
+        }
+        self.assertTrue(imager.linux_disk_is_safe(adapter, {"/dev/nvme0n1"}))
+        self.assertFalse(imager.linux_disk_is_safe(adapter, {"/dev/sdb"}))
+        self.assertFalse(imager.linux_disk_is_safe(dict(adapter, tran="nvme"), set()))
 
     def test_env_parser_does_not_execute_shell(self):
         manifest = {

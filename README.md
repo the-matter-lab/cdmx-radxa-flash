@@ -140,6 +140,10 @@ GitHub Release. El contenido de `site/` y la imagen verificada se sirven desde
 Lepton mediante Caddy y Cloudflare Tunnel. La configuración reproducible del
 sitio está en [`deploy/`](deploy/README.md).
 
+Los lectores microSD conectados por USB-A o USB-C se detectan como discos USB;
+también se aceptan cuando el adaptador declara la tarjeta como medio fijo. Los
+discos de arranque y del sistema siguen excluidos.
+
 La web pública habla únicamente con el ayudante privilegiado en
 `127.0.0.1:8766`: muestra los discos extraíbles, las identidades y el progreso,
 pero la lectura y escritura física siempre ocurre en la laptop. El puente CORS
