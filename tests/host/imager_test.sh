@@ -206,6 +206,10 @@ assert_eq 2 "$(sed -n '/cdmx-color-lab.conf/,/^EOF$/p' "$ROOT/device/install.sh"
   'software I2C kernel modules load at boot'
 assert_eq 1 "$(grep -c 'systemctl disable --now cdmx-color-lab.service' "$ROOT/device/install.sh")" \
   'Color Lab web process is not an always-on image service'
+assert_eq 1 "$(grep -c 'ufw allow from "\$subnet" to any port 8000 proto tcp' "$ROOT/device/configure-firewall.sh")" \
+  'BayesOpt results are reachable from private workshop networks when served'
+assert_eq 1 "$(grep -c 'ufw allow from "\$subnet" to any port 8010 proto tcp' "$ROOT/device/configure-firewall.sh")" \
+  'Color Lab is reachable from private workshop networks when started manually'
 assert_eq 1 "$(grep -c 'systemd-journal,i2c,spi,spidev' "$ROOT/device/install.sh")" \
   'workshop user receives permanent hardware device group access'
 assert_eq 1 "$(grep -c 'KERNEL==\"i2c-\[0-9\]\*\"' "$ROOT/device/install.sh")" \

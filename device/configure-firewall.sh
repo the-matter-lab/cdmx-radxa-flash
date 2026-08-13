@@ -9,6 +9,8 @@ ufw default allow outgoing
 for subnet in 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16; do
     ufw allow from "$subnet" to any port 22 proto tcp
     ufw allow from "$subnet" to any port 6080 proto tcp
+    ufw allow from "$subnet" to any port 8000 proto tcp
+    ufw allow from "$subnet" to any port 8010 proto tcp
     ufw allow from "$subnet" to any port 5353 proto udp
 done
 for subnet in 10.42.0.0/16 10.55.0.0/16; do
