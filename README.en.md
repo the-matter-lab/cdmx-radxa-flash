@@ -25,8 +25,9 @@ Open **[cdmx-radxaflash.mantilla.ca](https://cdmx-radxaflash.mantilla.ca)**:
    reach 100%.
 
 The public website can never access a laptop's disks directly. The privileged
-helper listens only on `127.0.0.1`, shows only removable USB/SD disks, rechecks
-the target before erasing, and downloads the version declared in
+helper listens only on `127.0.0.1`, shows only removable cards from built-in SD
+slots, USB-A/USB-C adapters, and native SD/MMC buses, rechecks the target before
+erasing, and downloads the version declared in
 [`site/manifest.json`](site/manifest.json). It caches the image and SHA-512 for
 subsequent cards.
 

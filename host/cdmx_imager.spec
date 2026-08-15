@@ -10,6 +10,7 @@ a = Analysis(
     binaries=[],
     datas=[
         (str(root / "site" / "manifest.json"), "site"),
+        (str(root / "host" / "windows" / "prepare-disk.ps1"), "host/windows"),
     ],
     hiddenimports=["pyfatfs.PyFatFS", "pyfatfs.PyFat", "fs"],
     hookspath=[],

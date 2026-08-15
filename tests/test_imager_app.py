@@ -140,6 +140,38 @@ class ImagerTests(unittest.TestCase):
         self.assertFalse(imager.windows_disk_is_safe(dict(adapter, is_system=True)))
         self.assertFalse(imager.windows_disk_is_safe(dict(adapter, protocol="NVMe")))
 
+    def test_windows_native_sd_and_mmc_readers_are_safe(self):
+        base = {
+            "id": r"\\.\PhysicalDrive3",
+            "name": "Built-in card reader",
+            "size": 64_000_000_000,
+            "is_boot": False,
+            "is_system": False,
+        }
+        self.assertTrue(imager.windows_disk_is_safe(dict(base, protocol="SD")))
+        self.assertTrue(imager.windows_disk_is_safe(dict(base, protocol="MMC")))
+        self.assertTrue(imager.windows_disk_is_safe(dict(base, protocol="USB")))
+
+    def test_windows_prepare_uses_state_aware_script(self):
+        original = imager.HOST_SYSTEM
+        try:
+            imager.HOST_SYSTEM = "Windows"
+            with mock.patch.object(imager, "powershell_file") as run_script:
+                imager.prepare_disk_for_write(r"\\.\PhysicalDrive12")
+            run_script.assert_called_once_with(
+                imager.WINDOWS_PREPARE_SCRIPT,
+                "-DiskNumber",
+                "12",
+            )
+        finally:
+            imager.HOST_SYSTEM = original
+
+    def test_powershell_error_exposes_windows_reason(self):
+        failed = mock.Mock(returncode=1, stdout="", stderr="Access is denied")
+        with mock.patch.object(imager, "command", return_value=failed):
+            with self.assertRaisesRegex(OSError, "Access is denied"):
+                imager.powershell("Get-Disk")
+
     def test_linux_usb_adapter_is_safe_even_if_not_marked_removable(self):
         adapter = {
             "name": "sdb",
@@ -271,20 +303,26 @@ class ImagerTests(unittest.TestCase):
         self.assertIn(imager.PUBLIC_SITE_URL, (MODULE_PATH.parents[1] / "host" / "start-imager.command").read_text())
 
         mac_launcher = (MODULE_PATH.parents[1] / "site" / "start-macos.sh").read_text(encoding="utf-8")
-        self.assertIn("SOURCE_COMMIT=ade5f3b540ad4ac4fb6a5b943c98a0f50bdf87b2", mac_launcher)
-        self.assertIn("ARCHIVE_SHA256=5dd25c9b65589c8460582a09652c64a3641b382bdd9a8322ec8eaf828fd57a9f", mac_launcher)
+        self.assertIn("SOURCE_COMMIT=c09d98c424d8ddf9d97ee2832ad0489ea4adb587", mac_launcher)
+        self.assertIn("ARCHIVE_SHA256=b749b31ffe17cfaf14ad7c79e424f107c673afd8406dedde464d9b1a11b36008", mac_launcher)
         self.assertIn("codeload.github.com/the-matter-lab/cdmx-radxa-flash", mac_launcher)
         self.assertIn("shasum -a 256", mac_launcher)
 
         linux_launcher = (MODULE_PATH.parents[1] / "site" / "start-linux.sh").read_text(encoding="utf-8")
-        self.assertIn("SOURCE_COMMIT=ade5f3b540ad4ac4fb6a5b943c98a0f50bdf87b2", linux_launcher)
+        self.assertIn("SOURCE_COMMIT=c09d98c424d8ddf9d97ee2832ad0489ea4adb587", linux_launcher)
         self.assertIn("sha256sum", linux_launcher)
         self.assertIn("exec sudo", linux_launcher)
 
         windows_launcher = (MODULE_PATH.parents[1] / "site" / "start-windows.ps1").read_text(encoding="utf-8")
-        self.assertIn('$SourceCommit = "ade5f3b540ad4ac4fb6a5b943c98a0f50bdf87b2"', windows_launcher)
+        self.assertIn('$SourceCommit = "c09d98c424d8ddf9d97ee2832ad0489ea4adb587"', windows_launcher)
         self.assertIn("Get-FileHash -Algorithm SHA256", windows_launcher)
         self.assertIn("WindowsBuiltInRole]::Administrator", windows_launcher)
+
+        windows_prepare = (MODULE_PATH.parents[1] / "host" / "windows" / "prepare-disk.ps1").read_text(encoding="utf-8")
+        self.assertIn('@("USB", "SD", "MMC")', windows_prepare)
+        self.assertIn("$Disk.IsOffline -and -not $Disk.IsReadOnly", windows_prepare)
+        self.assertIn("Dismount-CDMXTargetVolumes", windows_prepare)
+        self.assertIn("mountvol.exe $MountPoints[0] /p", windows_prepare)
 
         mac_uninstaller = (MODULE_PATH.parents[1] / "site" / "uninstall-macos.sh").read_text(encoding="utf-8")
         self.assertIn("/var/root/Library/Caches/CDMXRadxaFlash", mac_uninstaller)
