@@ -32,7 +32,7 @@ function Invoke-PrepareCase {
         [object[]]$AccessPaths = @()
     )
 
-    $script:MockDisk = [pscustomobject]@{
+    $global:MockDisk = [pscustomobject]@{
         Number = 8
         BusType = $BusType
         IsBoot = $false
@@ -40,15 +40,15 @@ function Invoke-PrepareCase {
         IsOffline = $Offline
         IsReadOnly = $ReadOnly
     }
-    $script:SetDiskCalls = [System.Collections.Generic.List[string]]::new()
-    $script:MountvolCalls = [System.Collections.Generic.List[string]]::new()
-    $script:OfflineUnsupported = $OfflineUnsupported
-    $script:AccessPaths = $AccessPaths
+    $global:SetDiskCalls = [System.Collections.Generic.List[string]]::new()
+    $global:MountvolCalls = [System.Collections.Generic.List[string]]::new()
+    $global:OfflineUnsupported = $OfflineUnsupported
+    $global:AccessPaths = $AccessPaths
 
     function global:Get-Disk {
         param([int]$Number, [string]$ErrorAction)
         if ($Number -ne 8) { throw "unexpected disk number $Number" }
-        return $script:MockDisk
+        return $global:MockDisk
     }
     function global:Set-Disk {
         param(
@@ -59,36 +59,36 @@ function Invoke-PrepareCase {
         )
         if ($Number -ne 8) { throw "unexpected disk number $Number" }
         if ($PSBoundParameters.ContainsKey("IsOffline")) {
-            $script:SetDiskCalls.Add("offline:$IsOffline")
-            if ([bool]$IsOffline -and $script:OfflineUnsupported) {
+            $global:SetDiskCalls.Add("offline:$IsOffline")
+            if ([bool]$IsOffline -and $global:OfflineUnsupported) {
                 throw "whole-disk offline is not supported by this reader"
             }
-            $script:MockDisk.IsOffline = [bool]$IsOffline
+            $global:MockDisk.IsOffline = [bool]$IsOffline
         }
         if ($PSBoundParameters.ContainsKey("IsReadOnly")) {
-            $script:SetDiskCalls.Add("readonly:$IsReadOnly")
-            $script:MockDisk.IsReadOnly = [bool]$IsReadOnly
+            $global:SetDiskCalls.Add("readonly:$IsReadOnly")
+            $global:MockDisk.IsReadOnly = [bool]$IsReadOnly
         }
     }
     function global:Get-Partition {
         param([int]$DiskNumber, [string]$ErrorAction)
         if ($DiskNumber -ne 8) { throw "unexpected disk number $DiskNumber" }
-        if ($script:AccessPaths.Count -gt 0) {
-            return [pscustomobject]@{ AccessPaths = $script:AccessPaths }
+        if ($global:AccessPaths.Count -gt 0) {
+            return [pscustomobject]@{ AccessPaths = $global:AccessPaths }
         }
         return @()
     }
     function global:mountvol.exe {
         param([string]$MountPoint, [string]$Operation)
-        $script:MountvolCalls.Add("$MountPoint $Operation")
+        $global:MountvolCalls.Add("$MountPoint $Operation")
         $global:LASTEXITCODE = 0
     }
 
     try {
         & $PrepareScript -DiskNumber 8
-        Assert-Equal -Expected $ExpectedCalls -Actual $script:SetDiskCalls.ToArray() -Label $Label
+        Assert-Equal -Expected $ExpectedCalls -Actual $global:SetDiskCalls.ToArray() -Label $Label
         if ($OfflineUnsupported) {
-            Assert-Equal -Expected @("E:\ /p") -Actual $script:MountvolCalls.ToArray() -Label "$Label uses volume fallback"
+            Assert-Equal -Expected @("E:\ /p") -Actual $global:MountvolCalls.ToArray() -Label "$Label uses volume fallback"
         }
     }
     finally {
