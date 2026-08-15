@@ -30,6 +30,7 @@ HOST_SYSTEM = platform.system()
 SOURCE_ROOT = Path(__file__).resolve().parents[1]
 BUNDLE_ROOT = Path(getattr(sys, "_MEIPASS", SOURCE_ROOT))
 LOCAL_MANIFEST = BUNDLE_ROOT / "site" / "manifest.json"
+WINDOWS_PREPARE_SCRIPT = BUNDLE_ROOT / "host" / "windows" / "prepare-disk.ps1"
 DEFAULT_MANIFEST_URL = "https://cdmx-radxaflash.mantilla.ca/manifest.json"
 TRUSTED_WEB_ORIGIN = "https://cdmx-radxaflash.mantilla.ca"
 PUBLIC_SITE_URL = TRUSTED_WEB_ORIGIN + "/"
@@ -114,10 +115,35 @@ def list_macos_disks() -> list[dict[str, object]]:
 
 def powershell(script: str, *, check: bool = True) -> subprocess.CompletedProcess[str]:
     executable = "powershell.exe"
-    return command(
+    result = command(
         [executable, "-NoLogo", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", script],
-        check=check,
+        check=False,
     )
+    if check and result.returncode:
+        detail = (result.stderr or result.stdout).strip()
+        raise OSError(detail or f"PowerShell exited with status {result.returncode}")
+    return result
+
+
+def powershell_file(path: Path, *arguments: str) -> subprocess.CompletedProcess[str]:
+    result = command(
+        [
+            "powershell.exe",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(path),
+            *arguments,
+        ],
+        check=False,
+    )
+    if result.returncode:
+        detail = (result.stderr or result.stdout).strip()
+        raise OSError(detail or f"PowerShell exited with status {result.returncode}")
+    return result
 
 
 def windows_disk_is_safe(item: dict[str, object]) -> bool:
@@ -567,7 +593,7 @@ def prepare_disk_for_write(disk: str) -> None:
         command(["diskutil", "unmountDisk", disk])
     elif HOST_SYSTEM == "Windows":
         number = windows_disk_number(disk)
-        powershell(f"Set-Disk -Number {number} -IsReadOnly $false; Set-Disk -Number {number} -IsOffline $true")
+        powershell_file(WINDOWS_PREPARE_SCRIPT, "-DiskNumber", str(number))
     elif HOST_SYSTEM == "Linux":
         output = command(["lsblk", "-lnpo", "NAME,MOUNTPOINT", disk]).stdout
         for line in output.splitlines()[1:]:

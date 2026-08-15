@@ -140,6 +140,38 @@ class ImagerTests(unittest.TestCase):
         self.assertFalse(imager.windows_disk_is_safe(dict(adapter, is_system=True)))
         self.assertFalse(imager.windows_disk_is_safe(dict(adapter, protocol="NVMe")))
 
+    def test_windows_native_sd_and_mmc_readers_are_safe(self):
+        base = {
+            "id": r"\\.\PhysicalDrive3",
+            "name": "Built-in card reader",
+            "size": 64_000_000_000,
+            "is_boot": False,
+            "is_system": False,
+        }
+        self.assertTrue(imager.windows_disk_is_safe(dict(base, protocol="SD")))
+        self.assertTrue(imager.windows_disk_is_safe(dict(base, protocol="MMC")))
+        self.assertTrue(imager.windows_disk_is_safe(dict(base, protocol="USB")))
+
+    def test_windows_prepare_uses_state_aware_script(self):
+        original = imager.HOST_SYSTEM
+        try:
+            imager.HOST_SYSTEM = "Windows"
+            with mock.patch.object(imager, "powershell_file") as run_script:
+                imager.prepare_disk_for_write(r"\\.\PhysicalDrive12")
+            run_script.assert_called_once_with(
+                imager.WINDOWS_PREPARE_SCRIPT,
+                "-DiskNumber",
+                "12",
+            )
+        finally:
+            imager.HOST_SYSTEM = original
+
+    def test_powershell_error_exposes_windows_reason(self):
+        failed = mock.Mock(returncode=1, stdout="", stderr="Access is denied")
+        with mock.patch.object(imager, "command", return_value=failed):
+            with self.assertRaisesRegex(OSError, "Access is denied"):
+                imager.powershell("Get-Disk")
+
     def test_linux_usb_adapter_is_safe_even_if_not_marked_removable(self):
         adapter = {
             "name": "sdb",
@@ -285,6 +317,12 @@ class ImagerTests(unittest.TestCase):
         self.assertIn('$SourceCommit = "ade5f3b540ad4ac4fb6a5b943c98a0f50bdf87b2"', windows_launcher)
         self.assertIn("Get-FileHash -Algorithm SHA256", windows_launcher)
         self.assertIn("WindowsBuiltInRole]::Administrator", windows_launcher)
+
+        windows_prepare = (MODULE_PATH.parents[1] / "host" / "windows" / "prepare-disk.ps1").read_text(encoding="utf-8")
+        self.assertIn('@("USB", "SD", "MMC")', windows_prepare)
+        self.assertIn("$Disk.IsOffline -and -not $Disk.IsReadOnly", windows_prepare)
+        self.assertIn("Dismount-CDMXTargetVolumes", windows_prepare)
+        self.assertIn("mountvol.exe $MountPoints[0] /p", windows_prepare)
 
         mac_uninstaller = (MODULE_PATH.parents[1] / "site" / "uninstall-macos.sh").read_text(encoding="utf-8")
         self.assertIn("/var/root/Library/Caches/CDMXRadxaFlash", mac_uninstaller)

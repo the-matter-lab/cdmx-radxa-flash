@@ -26,7 +26,8 @@ Abra **[cdmx-radxaflash.mantilla.ca](https://cdmx-radxaflash.mantilla.ca)**:
 
 La web pública nunca puede acceder directamente a un disco de la laptop. El
 ayudante privilegiado escucha solo en `127.0.0.1`, muestra únicamente unidades
-USB/SD extraíbles, vuelve a comprobar el destino antes de borrarlo y descarga la
+extraíbles de lectores SD integrados, adaptadores USB-A/USB-C y buses SD/MMC,
+vuelve a comprobar el destino antes de borrarlo y descarga la
 versión indicada en [`site/manifest.json`](site/manifest.json). La imagen y su
 SHA‑512 se guardan en caché para las tarjetas siguientes.
 
