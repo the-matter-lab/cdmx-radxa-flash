@@ -1,8 +1,8 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-SOURCE_COMMIT=ade5f3b540ad4ac4fb6a5b943c98a0f50bdf87b2
-ARCHIVE_SHA256=5dd25c9b65589c8460582a09652c64a3641b382bdd9a8322ec8eaf828fd57a9f
+SOURCE_COMMIT=c09d98c424d8ddf9d97ee2832ad0489ea4adb587
+ARCHIVE_SHA256=b749b31ffe17cfaf14ad7c79e424f107c673afd8406dedde464d9b1a11b36008
 ARCHIVE_URL="https://codeload.github.com/the-matter-lab/cdmx-radxa-flash/tar.gz/${SOURCE_COMMIT}"
 APP_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/cdmx-radxa-flash"
 SOURCE_DIR="${APP_DIR}/source-${SOURCE_COMMIT}"
