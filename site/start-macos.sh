@@ -3,8 +3,8 @@ set -Eeuo pipefail
 
 # The hosted launcher intentionally installs a reviewed, immutable source
 # snapshot instead of asking macOS to trust an unsigned application bundle.
-SOURCE_COMMIT=6dafd2620e06711910ef66873a7b0f70284b1626
-ARCHIVE_SHA256=97805aca5eed02238c400f5ec4271babb71e0386028f6f2b5bd38544e214e27b
+SOURCE_COMMIT=0380f57a9550c8e3e7895425096aa934a507c901
+ARCHIVE_SHA256=b9778ffee98013789204e3793abbd9b3695a1626f364815d3623cf88d5e877b2
 ARCHIVE_URL="https://codeload.github.com/the-matter-lab/cdmx-radxa-flash/tar.gz/${SOURCE_COMMIT}"
 APP_DIR="${HOME}/Library/Application Support/CDMXRadxaFlash"
 SOURCE_DIR="${APP_DIR}/source-${SOURCE_COMMIT}"
