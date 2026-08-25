@@ -4,8 +4,11 @@ set -eu
 config=/etc/cdmx/workshop.conf
 team=$(awk -F= '$1 == "TEAM" {print $2; exit}' "$config")
 case "$team" in
-    0|1|2|3|4|5|6|7|8|9|10|11) network_index=$team ;;
-    admin) network_index=12 ;;
+    0|[1-9]|[1-9][0-9])
+        [ "$team" -le 98 ] || exit 1
+        network_index=$team
+        ;;
+    admin) network_index=99 ;;
     *) exit 1 ;;
 esac
 

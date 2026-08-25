@@ -36,6 +36,10 @@ Cambie `/dev/diskN` por el disco extraíble y `admin` por `0`–`11` cuando
 corresponda. Este modo exige el marcador de la imagen del taller en la
 partición de configuración y rechaza otros discos.
 
+La imagen y el ayudante reservan `99` para `admin` y aceptan equipos numéricos
+de `0` a `98`. La web controla cuántos muestra con la constante `TEAM_COUNT`;
+aumentarla no exige reconstruir la imagen.
+
 ## Desde el código fuente en macOS
 
 Abra `host/start-imager.command`. La primera ejecución crea `.venv-imager` e

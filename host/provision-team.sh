@@ -14,7 +14,7 @@ while (($#)); do
     --team) team=${2:-}; shift 2 ;;
     --config-dir) config_dir=${2:-}; shift 2 ;;
     -h|--help)
-      printf 'Usage: %s --team 0..11|admin (--disk /dev/DISK | --config-dir PATH)\n' "$0"
+      printf 'Usage: %s --team 0..98|admin (--disk /dev/DISK | --config-dir PATH)\n' "$0"
       exit 0 ;;
     *) die "Unknown argument: $1" ;;
   esac

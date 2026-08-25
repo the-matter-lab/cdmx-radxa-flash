@@ -26,8 +26,11 @@ fi
 team=$(awk -F= '$1 == "CDMX_TEAM" {print $2; exit}' "$marker")
 requested_hostname=$(awk -F= '$1 == "CDMX_HOSTNAME" {print $2; exit}' "$marker")
 case "$team" in
-    0|1|2|3|4|5|6|7|8|9|10|11) hostname="equipo$team"; network_index=$team ;;
-    admin) hostname='admin'; network_index=12 ;;
+    0|[1-9]|[1-9][0-9])
+        [[ $team != 99 ]] || { printf 'Invalid CDMX_TEAM marker.\n' >&2; exit 65; }
+        hostname="equipo$team"; network_index=$team
+        ;;
+    admin) hostname='admin'; network_index=99 ;;
     *) printf 'Invalid CDMX_TEAM marker.\n' >&2; exit 65 ;;
 esac
 [[ $requested_hostname == "$hostname" ]] || { printf 'Hostname marker does not match team.\n' >&2; exit 65; }

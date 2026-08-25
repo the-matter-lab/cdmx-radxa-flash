@@ -21,25 +21,27 @@ CONFIG_PATH = Path(os.environ.get("CDMX_CONFIG", "/etc/cdmx/workshop.conf"))
 TOKEN_PATH = Path(os.environ.get("CDMX_PORTAL_TOKEN", "/run/cdmx/network-portal-token"))
 LOGO_PATH = Path(os.environ.get("CDMX_PORTAL_LOGO", "/usr/local/share/cdmx/matter-lab-logo.svg"))
 MAX_BODY = 4096
+MAX_TEAM_ID = 98
+ADMIN_NETWORK_INDEX = 99
 
 
 def validate_identity(value: object) -> int | str:
     if value == "admin":
         return "admin"
     if isinstance(value, bool):
-        raise ValueError("TEAM must be admin or between 0 and 11")
+        raise ValueError(f"TEAM must be admin or between 0 and {MAX_TEAM_ID}")
     try:
         team = int(value)  # type: ignore[arg-type]
     except (TypeError, ValueError) as exc:
-        raise ValueError("TEAM must be admin or between 0 and 11") from exc
-    if team not in range(12) or str(value) != str(team):
-        raise ValueError("TEAM must be admin or between 0 and 11")
+        raise ValueError(f"TEAM must be admin or between 0 and {MAX_TEAM_ID}") from exc
+    if team not in range(MAX_TEAM_ID + 1) or str(value) != str(team):
+        raise ValueError(f"TEAM must be admin or between 0 and {MAX_TEAM_ID}")
     return team
 
 
 def identity_index(identity: object) -> int:
     validated = validate_identity(identity)
-    return 12 if validated == "admin" else validated
+    return ADMIN_NETWORK_INDEX if validated == "admin" else validated
 
 
 def identity_hostname(identity: object) -> str:

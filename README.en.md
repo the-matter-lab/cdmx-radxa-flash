@@ -4,7 +4,7 @@
 🇬🇧 [![English](https://img.shields.io/badge/lang-English-blue.svg)](README.en.md)
 
 This is the workshop infrastructure repository. It builds the reproducible
-RadxaOS image for the ZERO 3W boards, personalizes `equipo0`–`equipo11` and
+RadxaOS image for the ZERO 3W boards, supports `equipo0`–`equipo98` and
 `admin`, and contains the Wi-Fi portal, Openbox/noVNC desktop, and macOS and
 Windows flashing helpers.
 
@@ -23,6 +23,11 @@ Open **[cdmx-radxaflash.mantilla.ca](https://cdmx-radxaflash.mantilla.ca)**:
 3. Select the removable drive and `equipo0`–`equipo11` or `admin`.
 4. Confirm the erase and wait for both writing **and read-back verification** to
    reach 100%.
+
+The website currently shows twelve teams (`equipo0`–`equipo11`). The image and
+helper already accept numeric identities through `equipo98`; `admin` reserves
+network index `99`. To add teams later, only change `TEAM_COUNT` in
+`site/index.html`; the SD image does not need to be rebuilt.
 
 The public website can never access a laptop's disks directly. The privileged
 helper listens only on `127.0.0.1`, shows only removable cards from built-in SD
@@ -104,7 +109,7 @@ Windows, and Android. If the OS does not open it, use:
 
 ```text
 equipoN: http://10.42.N.1:8080/
-admin:   http://10.42.12.1:8080/
+admin:   http://10.42.99.1:8080/
 ```
 
 After saving Wi-Fi, reconnect the laptop or phone to that LAN:

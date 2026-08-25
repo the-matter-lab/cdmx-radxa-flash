@@ -57,13 +57,14 @@ class ImagerTests(unittest.TestCase):
         self.assertEqual(imager.validate_team(9), 9)
         self.assertEqual(imager.validate_team(10), 10)
         self.assertEqual(imager.validate_team(11), 11)
+        self.assertEqual(imager.validate_team(98), 98)
         self.assertEqual(imager.validate_team("admin"), "admin")
         self.assertEqual(imager.identity_name("admin"), "admin")
         self.assertEqual(imager.identity_name(4), "equipo4")
         self.assertEqual(imager.parse_cli_team("0"), 0)
         self.assertEqual(imager.parse_cli_team("11"), 11)
         self.assertEqual(imager.parse_cli_team("admin"), "admin")
-        for invalid in (-1, 12, "0", True, None):
+        for invalid in (-1, 99, 100, "0", True, None):
             with self.assertRaises(ValueError):
                 imager.validate_team(invalid)
         with self.assertRaises(argparse.ArgumentTypeError):
@@ -291,7 +292,8 @@ class ImagerTests(unittest.TestCase):
         self.assertIn("/api/session", public_html)
         self.assertIn("/api/flash", public_html)
         self.assertIn("IDENTITIES", public_html)
-        self.assertIn("IDENTITIES=[0,1,2,3,4,5,6,7,8,9,10,11,'admin']", public_html)
+        self.assertIn("TEAM_COUNT=12", public_html)
+        self.assertIn("IDENTITIES=[...Array(TEAM_COUNT).keys(),'admin']", public_html)
         self.assertIn("Reintentar", public_html)
         self.assertIn("Copiar comando", public_html)
         self.assertIn("lector SD integrado", public_html)

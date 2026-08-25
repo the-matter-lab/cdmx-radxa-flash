@@ -14,7 +14,8 @@ if [[ -z $root && $EUID -ne 0 ]]; then
 fi
 
 case "$team" in
-    0|1|2|3|4|5|6|7|8|9|10|11)
+    0|[1-9]|[1-9][0-9])
+        [[ $team != 99 ]] || { printf 'Team must be 0-98 or admin.\n' >&2; exit 64; }
         desktop_memory_high=256M
         desktop_memory_max=320M
         agent_memory_high=192M
@@ -26,7 +27,7 @@ case "$team" in
         agent_memory_high=384M
         agent_memory_max=512M
         ;;
-    *) printf 'Team must be 0-11 or admin.\n' >&2; exit 64 ;;
+    *) printf 'Team must be 0-98 or admin.\n' >&2; exit 64 ;;
 esac
 
 desktop_dropin="$root/etc/systemd/system/cdmx-desktop.service.d/20-memory.conf"

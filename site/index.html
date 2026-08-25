@@ -76,7 +76,8 @@ footer{display:flex;justify-content:space-between;gap:16px;margin-top:24px;color
 </main>
 <script>
 const API='http://127.0.0.1:8766';
-const IDENTITIES=[0,1,2,3,4,5,6,7,8,9,10,11,'admin'];
+const TEAM_COUNT=12;
+const IDENTITIES=[...Array(TEAM_COUNT).keys(),'admin'];
 const LAUNCHERS={macos:{label:'macOS',hint:'Chrome · permite acceso local si lo pide.',script:'start-macos.sh',command:'/bin/bash -c "$(curl -fsSL https://cdmx-radxaflash.mantilla.ca/start-macos.sh)"',uninstallScript:'uninstall-macos.sh',uninstallCommand:'/bin/bash -c "$(curl -fsSL https://cdmx-radxaflash.mantilla.ca/uninstall-macos.sh)"'},windows:{label:'Windows',hint:'Edge/Chrome · permite acceso local si lo pide.',script:'start-windows.ps1',command:'powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://cdmx-radxaflash.mantilla.ca/start-windows.ps1 | iex"',uninstallScript:'uninstall-windows.ps1',uninstallCommand:'powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://cdmx-radxaflash.mantilla.ca/uninstall-windows.ps1 | iex"'},linux:{label:'Linux',hint:'Chrome/Chromium · permite acceso local si lo pide.',script:'start-linux.sh',command:'/bin/bash -c "$(curl -fsSL https://cdmx-radxaflash.mantilla.ca/start-linux.sh)"',uninstallScript:'uninstall-linux.sh',uninstallCommand:'/bin/bash -c "$(curl -fsSL https://cdmx-radxaflash.mantilla.ca/uninstall-linux.sh)"'}};
 let token='',selected=0,lastState=null,failures=0,platform='macos',launcherMode='install';
 const $=id=>document.getElementById(id);

@@ -4,7 +4,7 @@
 🇬🇧 [![English](https://img.shields.io/badge/lang-English-blue.svg)](README.en.md)
 
 Este es el repositorio de infraestructura del taller. Construye la imagen
-RadxaOS reproducible para las ZERO 3W, prepara `equipo0`–`equipo11` y `admin`, y
+RadxaOS reproducible para las ZERO 3W, admite `equipo0`–`equipo98` y `admin`, y
 contiene el portal de Wi‑Fi, el escritorio Openbox/noVNC y los ayudantes de
 flasheo para macOS y Windows.
 
@@ -23,6 +23,11 @@ Abra **[cdmx-radxaflash.mantilla.ca](https://cdmx-radxaflash.mantilla.ca)**:
 3. Seleccione la unidad extraíble y `equipo0`–`equipo11` o `admin`.
 4. Confirme el borrado y espere a que la escritura **y la lectura de
    verificación** lleguen a 100%.
+
+La web muestra actualmente doce equipos (`equipo0`–`equipo11`). La imagen y el
+ayudante ya aceptan identidades numéricas hasta `equipo98`; `admin` reserva el
+índice de red `99`. Para añadir equipos más adelante, solo cambie `TEAM_COUNT`
+en `site/index.html`, sin reconstruir la imagen SD.
 
 La web pública nunca puede acceder directamente a un disco de la laptop. El
 ayudante privilegiado escucha solo en `127.0.0.1`, muestra únicamente unidades
@@ -104,7 +109,7 @@ si el sistema no lo abre, use:
 
 ```text
 equipoN: http://10.42.N.1:8080/
-admin:   http://10.42.12.1:8080/
+admin:   http://10.42.99.1:8080/
 ```
 
 Después de guardar el Wi‑Fi, vuelva a conectar la laptop o el teléfono a esa

@@ -26,7 +26,11 @@ host_os() {
 
 validate_team() {
   local team=${1:-}
-  [[ "$team" == admin || "$team" =~ ^([0-9]|1[01])$ ]] || die "Identity must be admin or an integer from 0 through 11"
+  if [[ "$team" == admin ]]; then
+    return
+  fi
+  [[ "$team" =~ ^(0|[1-9]|[1-9][0-9])$ && "$team" != 99 ]] ||
+    die "Identity must be admin or an integer from 0 through 98"
 }
 
 team_hostname() {

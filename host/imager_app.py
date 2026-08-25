@@ -39,6 +39,7 @@ MAC_DISK_PATTERN = re.compile(r"^/dev/disk[0-9]+$")
 LINUX_DISK_PATTERN = re.compile(r"^/dev/(?:sd[a-z]+|mmcblk[0-9]+)$")
 WINDOWS_DISK_PATTERN = re.compile(r"^\\\\\.\\PhysicalDrive([0-9]+)$", re.IGNORECASE)
 SHA512_PATTERN = re.compile(r"^[0-9a-f]{128}$")
+MAX_TEAM_ID = 98
 WINDOWS_SAFE_BUS_TYPES = {"USB", "SD", "MMC"}
 CHUNK_SIZE = 4 * 1024 * 1024
 RUNTIME: dict[str, object] = {}
@@ -304,8 +305,8 @@ def ensure_disk(disk: str, required_bytes: int = 0) -> dict[str, object]:
 def validate_team(team: object) -> int | str:
     if team == "admin":
         return "admin"
-    if isinstance(team, bool) or not isinstance(team, int) or team not in range(12):
-        raise ValueError("identity must be admin or an integer from 0 through 11")
+    if isinstance(team, bool) or not isinstance(team, int) or team not in range(MAX_TEAM_ID + 1):
+        raise ValueError(f"identity must be admin or an integer from 0 through {MAX_TEAM_ID}")
     return team
 
 
@@ -315,7 +316,7 @@ def parse_cli_team(value: str) -> int | str:
     try:
         return validate_team(int(value))
     except (TypeError, ValueError) as exc:
-        raise argparse.ArgumentTypeError("team must be 0 through 11 or admin") from exc
+        raise argparse.ArgumentTypeError(f"team must be 0 through {MAX_TEAM_ID} or admin") from exc
 
 
 def identity_name(identity: object) -> str:
@@ -946,7 +947,7 @@ def main() -> int:
     parser.add_argument("--image", help="Use a local image that matches the manifest checksum")
     parser.add_argument("--no-browser", action="store_true")
     parser.add_argument("--provision-only", metavar="DISK", help="Finish identity assignment on an already verified card")
-    parser.add_argument("--team", type=parse_cli_team, help="Identity for --provision-only: 0 through 11 or admin")
+    parser.add_argument("--team", type=parse_cli_team, help=f"Identity for --provision-only: 0 through {MAX_TEAM_ID} or admin")
     args = parser.parse_args()
     if not is_administrator():
         print("Start this helper as Administrator so it can access the removable SD card.")
