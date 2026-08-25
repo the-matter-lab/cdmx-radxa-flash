@@ -1,0 +1,4 @@
+XTerm*selectToClipboard: true
+XTerm*VT100.Translations: #override \
+    Ctrl Shift <Key>V: insert-selection(CLIPBOARD) \n\
+    Shift <Key>Insert: insert-selection(CLIPBOARD)

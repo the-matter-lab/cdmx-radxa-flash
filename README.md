@@ -77,6 +77,9 @@ comandos existente con `host/flash-team.sh`.
   de Ciudad de México, dos espacios `AGENTS`/`BAYES`, terminal, Geany, monitor
   y fondo de Matter Lab.
 - noVNC compartido: control en `control.html` y observación en `view.html`.
+  El panel Clipboard acepta hasta 1 MiB desde la laptop y sincroniza las
+  selecciones X11 CLIPBOARD/PRIMARY; pegue con `Ctrl+V` en Geany o
+  `Ctrl+Shift+V`/`Shift+Insert` en la terminal.
 - Portal cautivo para introducir el Wi‑Fi del recinto sin teclado.
 - SSH mediante clave pública, `sudo` local sin contraseña y servicios systemd
   que vuelven a iniciar después de un ciclo normal de energía.

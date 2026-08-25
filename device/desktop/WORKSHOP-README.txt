@@ -17,6 +17,12 @@ Las skills y tools llegan dentro del clon cdmx-local-ai; no vienen instaladas
 en la imagen. Reset, a la derecha del reloj, pide confirmacion y borra los dos
 clones, los resultados, los archivos del agente y su configuracion local.
 
+COPIAR Y PEGAR DESDE SU LAPTOP
+
+Abra la barra lateral de noVNC, elija Clipboard y pegue ahi la solucion. Haga
+clic en el escritorio para enviarla. Luego use Ctrl+V en Geany, o
+Ctrl+Shift+V / Shift+Insert en la terminal de la Radxa.
+
 LABORATORIO DE COLOR (manual)
 
   ./get-bayesopt-code
@@ -54,6 +60,12 @@ LOCAL AI
 Skills and tools arrive inside the cdmx-local-ai clone; they are not installed
 in the image. Reset, to the right of the clock, asks for confirmation and
 removes both clones, results, agent files, and local agent configuration.
+
+COPY AND PASTE FROM YOUR LAPTOP
+
+Open the noVNC side toolbar, choose Clipboard, and paste the solution there.
+Click the desktop to send it. Then use Ctrl+V in Geany, or Ctrl+Shift+V /
+Shift+Insert in the Radxa terminal.
 
 COLOR LAB (manual)
 

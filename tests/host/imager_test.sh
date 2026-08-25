@@ -163,6 +163,18 @@ assert_eq 0 "$(grep -Ec '^(NoNewPrivileges|PrivateDevices|ProtectSystem|ProtectH
   'shared desktop terminals can use sudo and workshop GPIO devices'
 assert_eq 1 "$(grep -c '^NoNewPrivileges=true$' "$ROOT/device/systemd/cdmx-novnc.service")" \
   'noVNC gateway retains its privilege sandbox'
+assert_eq 1 "$(grep -c -- '-AcceptCutText=1 -SendCutText=1 -SetPrimary=1 -SendPrimary=1' "$ROOT/device/desktop/start-session.sh")" \
+  'TigerVNC explicitly enables clipboard transfer in both directions'
+assert_eq 1 "$(grep -c -- '-MaxCutText=1048576' "$ROOT/device/desktop/start-session.sh")" \
+  'TigerVNC accepts solution clipboard text up to one MiB'
+assert_eq 1 "$(grep -c 'xrdb -merge .*Xresources' "$ROOT/device/desktop/start-session.sh")" \
+  'desktop loads the terminal clipboard shortcuts'
+assert_eq 1 "$(grep -c 'Ctrl Shift <Key>V: insert-selection(CLIPBOARD)' "$ROOT/device/desktop/Xresources")" \
+  'terminal supports Ctrl-Shift-V from the noVNC clipboard'
+assert_eq 1 "$(grep -c 'Shift <Key>Insert: insert-selection(CLIPBOARD)' "$ROOT/device/desktop/Xresources")" \
+  'terminal supports Shift-Insert from the noVNC clipboard'
+assert_eq 0 "$(grep -c 'view_only' "$ROOT/device/desktop/novnc-web/control.html" || true)" \
+  'noVNC controller page is not read-only'
 assert_eq 1 "$(grep -c 'execp_command = printf '\'' APPS '\''' "$ROOT/device/desktop/tint2rc")" \
   'bottom panel has a persistent applications launcher'
 assert_eq 'panel_items = EEEEETSECE' \

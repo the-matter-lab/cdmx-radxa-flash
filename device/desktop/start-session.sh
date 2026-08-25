@@ -32,7 +32,7 @@ if [ -z "$XVNC" ]; then
     echo "TigerVNC server not found (expected Xtigervnc or Xvnc)." >&2
     exit 69
 fi
-for command_name in feh mcookie xauth openbox tint2 xdotool xterm xsetroot; do
+for command_name in feh mcookie xauth openbox tint2 xrdb xdotool xterm xsetroot; do
     if ! command -v "$command_name" >/dev/null 2>&1; then
         echo "Required desktop command not found: $command_name" >&2
         exit 69
@@ -59,6 +59,8 @@ trap cleanup EXIT INT TERM
     -geometry 1280x720 -depth 24 \
     -localhost yes "$@" \
     -AlwaysShared -AcceptKeyEvents -AcceptPointerEvents \
+    -AcceptCutText=1 -SendCutText=1 -SetPrimary=1 -SendPrimary=1 \
+    -MaxCutText=1048576 \
     -DisconnectClients=0 -NeverShared=0 \
     -rfbport 5901 -auth "$AUTH_FILE" \
     -Log '*:stderr:30' &
@@ -74,6 +76,11 @@ while [ ! -S "/tmp/.X11-unix/X${DISPLAY_NUMBER}" ] && [ "$i" -lt 50 ]; do
     i=$((i + 1))
     sleep 0.1
 done
+
+# noVNC sends host clipboard text through RFB. TigerVNC places it in the X11
+# CLIPBOARD and PRIMARY selections; these resources make both the editor and
+# xterm expose familiar paste shortcuts for workshop solutions.
+xrdb -merge "$ROOT/device/desktop/Xresources"
 
 openbox --config-file "$ROOT/device/desktop/openbox.xml" &
 CHILDREN="$CHILDREN $!"

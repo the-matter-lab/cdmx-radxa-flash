@@ -77,7 +77,9 @@ and asks for one administrator authorization. The existing
   City clock, two `AGENTS`/`BAYES` workspaces, terminal, Geany, monitor, and
   Matter Lab wallpaper.
 - Shared noVNC desktop: control through `control.html`, observation through
-  `view.html`.
+  `view.html`. The Clipboard panel accepts up to 1 MiB from the laptop and
+  synchronizes the X11 CLIPBOARD/PRIMARY selections; paste with `Ctrl+V` in
+  Geany or `Ctrl+Shift+V`/`Shift+Insert` in the terminal.
 - Captive Wi-Fi portal for keyboard-free venue onboarding.
 - Public-key SSH, passwordless local `sudo`, and systemd services that recover
   after normal power cycles.
