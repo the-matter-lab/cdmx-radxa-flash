@@ -55,6 +55,10 @@ mount "$root_loop" "$rootfs"
     printf 'The base image is not an unpersonalized CDMX workshop image.\n' >&2
     exit 65
 }
+[[ -f $rootfs/usr/lib/python3.11/tkinter/__init__.py ]] || {
+    printf 'The base image is missing python3-tk for the reset confirmation dialog.\n' >&2
+    exit 69
+}
 
 # Replace only the tracked workshop source and installed CDMX runtime files.
 # The proven OS, bootloader, packages, agent stack, and instructor key remain
@@ -108,4 +112,3 @@ umount "$rootfs"
 e2fsck -fy "$root_loop" >/dev/null
 losetup -d "$root_loop"
 root_loop=""
-

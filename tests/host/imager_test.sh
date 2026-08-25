@@ -163,6 +163,21 @@ assert_eq 1 "$(grep -c '^NoNewPrivileges=true$' "$ROOT/device/systemd/cdmx-novnc
   'noVNC gateway retains its privilege sandbox'
 assert_eq 1 "$(grep -c 'execp_command = printf '\'' APPS '\''' "$ROOT/device/desktop/tint2rc")" \
   'bottom panel has a persistent applications launcher'
+assert_eq 'panel_items = EEEEETSECE' \
+  "$(grep '^panel_items = ' "$ROOT/device/desktop/tint2rc")" \
+  'reset control is placed after the clock at the far right'
+assert_eq 1 "$(grep -c "execp_command = printf ' Reset '" "$ROOT/device/desktop/tint2rc")" \
+  'bottom panel has one BayesOpt reset control'
+assert_eq 1 "$(grep -c 'reset-bayesopt.py' "$ROOT/device/desktop/tint2rc")" \
+  'reset control opens the confirmation application'
+reset_workspace="$tmp/reset-workspace"
+mkdir -p "$reset_workspace/cdmx-bayesopt"
+touch "$reset_workspace/cdmx-bayesopt/result.txt" "$reset_workspace/get-bayesopt-code"
+CDMX_WORKSPACE="$reset_workspace" python3 "$ROOT/device/desktop/reset-bayesopt.py" --yes
+assert_eq no "$([[ -e $reset_workspace/cdmx-bayesopt ]] && printf yes || printf no)" \
+  'reset removes the BayesOpt checkout'
+assert_eq yes "$([[ -f $reset_workspace/get-bayesopt-code ]] && printf yes || printf no)" \
+  'reset preserves the clean-clone helper'
 assert_eq 0 "$(grep -c 'Get code' "$ROOT/device/desktop/tint2rc" || true)" \
   'bottom panel has no Get code launcher'
 assert_eq 'time1_timezone = :America/Mexico_City' \

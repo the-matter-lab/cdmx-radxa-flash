@@ -88,7 +88,7 @@ fi
 apt-get install -y --no-install-recommends \
     avahi-daemon bash build-essential ca-certificates curl feh geany git device-tree-compiler i2c-tools jq kmod locales nano \
     network-manager novnc openbox openssh-server python3 python3-matplotlib \
-    python3-numpy python3-pil python3-pip python3-smbus python3-spidev \
+    python3-numpy python3-pil python3-pip python3-smbus python3-spidev python3-tk \
     python3-setuptools python3-wheel \
     python3-venv rfkill sudo tigervnc-standalone-server \
     tint2 tmux tzdata ufw unattended-upgrades websockify x11-xserver-utils xauth xdotool xterm \

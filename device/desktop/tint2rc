@@ -20,8 +20,13 @@ border_width = 1
 background_color = #111827 100
 border_color = #334155 100
 
-# Five pinned launchers, taskbar, tray, system status, clock.
-panel_items = EEEEETSEC
+rounded = 5
+border_width = 1
+background_color = #7f1d1d 100
+border_color = #ef4444 100
+
+# Five app launchers, taskbar, tray, system status, clock, and reset.
+panel_items = EEEEETSECE
 panel_monitor = all
 panel_position = bottom center horizontal
 panel_size = 100% 42
@@ -147,6 +152,19 @@ execp_font = Sans 9
 execp_font_color = #86efac 100
 execp_padding = 8 0
 execp_background_id = 0
+execp_centered = 1
+
+# RESET BAYESOPT — intentionally after the clock at the far right.
+execp = new
+execp_command = printf ' Reset '
+execp_interval = 0
+execp_has_icon = 0
+execp_tooltip = Delete only the BayesOpt checkout after Yes/No confirmation
+execp_lclick_command = python3 /opt/cdmx-radxa-flash/device/desktop/reset-bayesopt.py
+execp_font = Sans Bold 9
+execp_font_color = #ffffff 100
+execp_padding = 7 0
+execp_background_id = 5
 execp_centered = 1
 
 mouse_left = toggle_iconify
