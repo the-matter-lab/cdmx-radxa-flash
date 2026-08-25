@@ -23,7 +23,7 @@ Install the workshop stack on a booted Radxa ZERO 3W running the pinned RadxaOS.
 Local workshop services are passwordless. SSH accepts public keys only.
 
 Options:
-  --team ID             Initial identity: 0-9 or admin
+  --team ID             Initial identity: 0-11 or admin
   --skip-upgrade        Skip apt full-upgrade (package lists are still refreshed)
   --skip-agents         Do not download PicoClaw/Pi now
   --enable-usb-ncm      Enable radxa-ncm if the OTG overlay was already selected
@@ -52,13 +52,13 @@ if [[ $EUID -ne 0 ]]; then
     exit 77
 fi
 case "$team" in
-    0|1|2|3|4|5|6|7|8|9)
+    0|1|2|3|4|5|6|7|8|9|10|11)
         device_hostname="equipo$team"; network_index=$team
         ;;
     admin)
-        device_hostname='admin'; network_index=10
+        device_hostname='admin'; network_index=12
         ;;
-    *) printf '%s\n' '--team must be 0-9 or admin' >&2; exit 64 ;;
+    *) printf '%s\n' '--team must be 0-11 or admin' >&2; exit 64 ;;
 esac
 
 if [[ $(dpkg --print-architecture) != arm64 ]]; then
@@ -402,7 +402,7 @@ if [[ -f /etc/systemd/system/cdmx-picoclaw.service ]]; then
 fi
 
 # The golden image starts as admin, then cdmx-personalize reapplies the tighter
-# profile when the flasher assigns equipo0-equipo9 to a 1 GB workshop board.
+# profile when the flasher assigns equipo0-equipo11 to a 1 GB workshop board.
 if $offline_image; then
     CDMX_OFFLINE_IMAGE=1 /usr/local/sbin/cdmx-apply-resource-limits "$team"
 else

@@ -4,7 +4,7 @@
 🇬🇧 [![English](https://img.shields.io/badge/lang-English-blue.svg)](README.en.md)
 
 This is the workshop infrastructure repository. It builds the reproducible
-RadxaOS image for the ZERO 3W boards, personalizes `equipo0`–`equipo9` and
+RadxaOS image for the ZERO 3W boards, personalizes `equipo0`–`equipo11` and
 `admin`, and contains the Wi-Fi portal, Openbox/noVNC desktop, and macOS and
 Windows flashing helpers.
 
@@ -20,7 +20,7 @@ Open **[cdmx-radxaflash.mantilla.ca](https://cdmx-radxaflash.mantilla.ca)**:
 1. Insert an SD card of at least 8 GB.
 2. Choose macOS, Windows, or Linux on the page and copy the command. Paste it
    into Terminal or an Administrator PowerShell window.
-3. Select the removable drive and `equipo0`–`equipo9` or `admin`.
+3. Select the removable drive and `equipo0`–`equipo11` or `admin`.
 4. Confirm the erase and wait for both writing **and read-back verification** to
    reach 100%.
 
@@ -104,7 +104,7 @@ Windows, and Android. If the OS does not open it, use:
 
 ```text
 equipoN: http://10.42.N.1:8080/
-admin:   http://10.42.10.1:8080/
+admin:   http://10.42.12.1:8080/
 ```
 
 After saving Wi-Fi, reconnect the laptop or phone to that LAN:

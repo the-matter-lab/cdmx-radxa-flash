@@ -27,19 +27,19 @@ def validate_identity(value: object) -> int | str:
     if value == "admin":
         return "admin"
     if isinstance(value, bool):
-        raise ValueError("TEAM must be admin or between 0 and 9")
+        raise ValueError("TEAM must be admin or between 0 and 11")
     try:
         team = int(value)  # type: ignore[arg-type]
     except (TypeError, ValueError) as exc:
-        raise ValueError("TEAM must be admin or between 0 and 9") from exc
-    if team not in range(10) or str(value) != str(team):
-        raise ValueError("TEAM must be admin or between 0 and 9")
+        raise ValueError("TEAM must be admin or between 0 and 11") from exc
+    if team not in range(12) or str(value) != str(team):
+        raise ValueError("TEAM must be admin or between 0 and 11")
     return team
 
 
 def identity_index(identity: object) -> int:
     validated = validate_identity(identity)
-    return 10 if validated == "admin" else validated
+    return 12 if validated == "admin" else validated
 
 
 def identity_hostname(identity: object) -> str:

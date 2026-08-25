@@ -16,7 +16,7 @@ while (($#)); do
     --image) image=${2:-}; shift 2 ;;
     --confirm) confirmation=${2:-}; shift 2 ;;
     -h|--help)
-      printf 'Usage: %s --team 0..9|admin --disk /dev/DISK [--image GOLDEN.img.xz]\n' "$0"
+      printf 'Usage: %s --team 0..11|admin --disk /dev/DISK [--image GOLDEN.img.xz]\n' "$0"
       exit 0 ;;
     *) die "Unknown argument: $1" ;;
   esac

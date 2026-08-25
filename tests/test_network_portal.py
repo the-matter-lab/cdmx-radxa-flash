@@ -17,12 +17,17 @@ class NetworkPortalTests(unittest.TestCase):
             portal.captive_api(7),
             '{"captive":true,"user-portal-url":"http://10.42.7.1:8080/"}',
         )
-        self.assertEqual(portal.portal_url("admin"), "http://10.42.10.1:8080/")
+        self.assertEqual(portal.portal_url(11), "http://10.42.11.1:8080/")
+        self.assertEqual(portal.identity_hostname(10), "equipo10")
+        self.assertEqual(portal.identity_hostname(11), "equipo11")
+        self.assertEqual(portal.portal_url("admin"), "http://10.42.12.1:8080/")
         self.assertEqual(
             portal.captive_api("admin"),
-            '{"captive":true,"user-portal-url":"http://10.42.10.1:8080/"}',
+            '{"captive":true,"user-portal-url":"http://10.42.12.1:8080/"}',
         )
         self.assertEqual(portal.identity_hostname("admin"), "admin")
+        with self.assertRaises(ValueError):
+            portal.validate_identity(12)
 
     def test_split_nmcli_escaped_colons(self):
         self.assertEqual(
@@ -45,8 +50,10 @@ class NetworkPortalTests(unittest.TestCase):
         self.assertTrue(portal.allowed_client("10.55.0.2", 0))
         self.assertTrue(portal.allowed_client("10.42.7.22", 7))
         self.assertTrue(portal.allowed_client("10.55.7.2", 7))
-        self.assertTrue(portal.allowed_client("10.42.10.22", "admin"))
-        self.assertTrue(portal.allowed_client("10.55.10.2", "admin"))
+        self.assertTrue(portal.allowed_client("10.42.11.22", 11))
+        self.assertTrue(portal.allowed_client("10.55.11.2", 11))
+        self.assertTrue(portal.allowed_client("10.42.12.22", "admin"))
+        self.assertTrue(portal.allowed_client("10.55.12.2", "admin"))
         self.assertTrue(portal.allowed_client("127.0.0.1", 7))
         self.assertFalse(portal.allowed_client("10.42.8.22", 7))
         self.assertFalse(portal.allowed_client("192.168.1.2", 7))

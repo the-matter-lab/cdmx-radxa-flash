@@ -2,12 +2,12 @@
 
 ## Dos semanas antes
 
-- Confirme que las diez placas sean ZERO 3W de 1 GB y que todas las tarjetas SD
+- Confirme que las doce placas sean ZERO 3W de 1 GB y que todas las tarjetas SD
   sean del mismo modelo y tengan la misma capacidad en bytes.
 - Use fuentes de alimentación de 5 V/2 A o superiores y pruebe los cables de
   alimentación exactos. La ZERO 3 solo acepta una entrada de 5 V.
 - Construya y verifique la imagen local del taller en la Mac.
-- Grabe `equipo0` a `equipo9`; nunca arranque dos tarjetas con el mismo número.
+- Grabe `equipo0` a `equipo11`; nunca arranque dos tarjetas con el mismo número.
 - Arranque cada tarjeta dos veces, incluida una prueba intencional de desconexión
   y reconexión después de que hayan terminado todas las escrituras.
 - Verifique `.local`, SSH, noVNC de control, noVNC de solo lectura, zram y la
@@ -20,9 +20,9 @@
 
 - Una clave pública SSH del instructor. La clave privada nunca se copia a las
   tarjetas. El Wi-Fi de configuración y noVNC no usan contraseña.
-- Diez claves de proyecto de OpenAI o, preferentemente, diez claves virtuales de
+- Doce claves de proyecto de OpenAI o, preferentemente, doce claves virtuales de
   LiteLLM con presupuesto limitado.
-- Diez bots de Telegram, uno por equipo. Registre cada token en una hoja de
+- Doce bots de Telegram, uno por equipo. Registre cada token en una hoja de
   secretos del instructor sin conexión y configure un grupo de equipo por bot.
 - De uno a cinco identificadores numéricos de usuario de Telegram por equipo.
   No use un comodín ni una lista de usuarios autorizados vacía.
@@ -35,7 +35,7 @@ tarjeta. Nunca las agregue a la imagen local ni al repositorio.
 ## Ensayo de la red del recinto
 
 - Prefiera un router o punto de acceso exclusivo para el taller, dimensionado
-  para aproximadamente 60 clientes (diez placas más los dispositivos de los
+  para aproximadamente 62 clientes (doce placas más los dispositivos de los
   participantes). Verifique la capacidad de DHCP y el tráfico entre clientes.
 - Si usará el Wi-Fi del recinto, pregunte explícitamente si están bloqueados el
   tráfico multicast/mDNS y el tráfico entre dispositivos. Una conexión exitosa

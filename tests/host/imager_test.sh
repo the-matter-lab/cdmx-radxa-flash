@@ -29,8 +29,10 @@ assert_fails() {
 
 assert_eq 0 "$(validate_team 0; printf 0)" 'team 0 is valid'
 assert_eq 9 "$(validate_team 9; printf 9)" 'team 9 is valid'
+assert_eq 10 "$(validate_team 10; printf 10)" 'team 10 is valid'
+assert_eq 11 "$(validate_team 11; printf 11)" 'team 11 is valid'
 assert_eq admin "$(validate_team admin; printf admin)" 'admin identity is valid'
-assert_fails 'team 10 is rejected' validate_team 10
+assert_fails 'team 12 is rejected' validate_team 12
 assert_fails 'negative team is rejected' validate_team -1
 assert_fails 'non-numeric team is rejected' validate_team one
 if [[ $(host_os) == macos ]]; then
@@ -41,6 +43,9 @@ tmp=$(mktemp -d "${TMPDIR:-/tmp}/cdmx-test.XXXXXX")
 write_team_config "$tmp" 7
 assert_eq CDMX_TEAM=7 "$(grep '^CDMX_TEAM=' "$tmp/cdmx-team.env")" 'team marker contains number'
 assert_eq CDMX_HOSTNAME=equipo7 "$(grep '^CDMX_HOSTNAME=' "$tmp/cdmx-team.env")" 'team marker contains hostname'
+write_team_config "$tmp" 11
+assert_eq CDMX_TEAM=11 "$(grep '^CDMX_TEAM=' "$tmp/cdmx-team.env")" 'two-digit team marker contains number'
+assert_eq CDMX_HOSTNAME=equipo11 "$(grep '^CDMX_HOSTNAME=' "$tmp/cdmx-team.env")" 'two-digit team marker contains hostname'
 write_team_config "$tmp" admin
 assert_eq CDMX_TEAM=admin "$(grep '^CDMX_TEAM=' "$tmp/cdmx-team.env")" 'admin marker contains identity'
 assert_eq CDMX_HOSTNAME=admin "$(grep '^CDMX_HOSTNAME=' "$tmp/cdmx-team.env")" 'admin marker contains hostname'
@@ -75,6 +80,10 @@ assert_eq MemoryHigh=256M \
 assert_eq MemoryMax=256M \
   "$(grep '^MemoryMax=' "$limits_root/etc/systemd/system/cdmx-picoclaw.service.d/20-memory.conf")" \
   '1 GB team cards receive the lightweight agent memory profile'
+CDMX_ROOT="$limits_root" "$ROOT/device/apply-resource-limits.sh" 11
+assert_eq MemoryMax=256M \
+  "$(grep '^MemoryMax=' "$limits_root/etc/systemd/system/cdmx-picoclaw.service.d/20-memory.conf")" \
+  'team 11 receives the lightweight agent memory profile'
 CDMX_ROOT="$limits_root" "$ROOT/device/apply-resource-limits.sh" admin
 assert_eq MemoryMax=512M \
   "$(grep '^MemoryMax=' "$limits_root/etc/systemd/system/cdmx-desktop.service.d/20-memory.conf")" \
@@ -82,7 +91,7 @@ assert_eq MemoryMax=512M \
 assert_eq 1 "$(grep -c 'cdmx-apply-resource-limits \"\$team\"' "$ROOT/device/personalize.sh")" \
   'first-boot personalization reapplies limits for the assigned board'
 assert_fails 'resource limits reject an unknown team' env CDMX_ROOT="$limits_root" \
-  "$ROOT/device/apply-resource-limits.sh" 10
+  "$ROOT/device/apply-resource-limits.sh" 12
 assert_eq RuntimeDirectory=cdmx "$(grep '^RuntimeDirectory=' "$ROOT/device/systemd/cdmx-network-portal.service")" 'portal runtime directory exists before sandboxing'
 assert_eq 1 "$(grep -c 'cdmx-network-monitor.service' "$ROOT/device/install.sh")" \
   'image enables the runtime Wi-Fi recovery monitor'

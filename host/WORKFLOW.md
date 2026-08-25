@@ -6,7 +6,7 @@
 2. Elija macOS, Windows o Linux y copie la línea para Terminal o PowerShell.
 3. Inserte una SD de al menos 8.08 GB.
 4. Abra el ayudante con privilegios de administrador.
-5. Seleccione el disco extraíble y `equipo0`–`equipo9` o `admin`.
+5. Seleccione el disco extraíble y `equipo0`–`equipo11` o `admin`.
 6. Confirme el borrado exacto y espere a 100% antes de retirar la tarjeta.
 
 El ayudante obtiene `manifest.json` desde el sitio central. Descarga la imagen
@@ -32,7 +32,7 @@ sudo .venv-imager/bin/python host/imager_app.py \
   --provision-only /dev/diskN --team admin
 ```
 
-Cambie `/dev/diskN` por el disco extraíble y `admin` por `0`–`9` cuando
+Cambie `/dev/diskN` por el disco extraíble y `admin` por `0`–`11` cuando
 corresponda. Este modo exige el marcador de la imagen del taller en la
 partición de configuración y rechaza otros discos.
 

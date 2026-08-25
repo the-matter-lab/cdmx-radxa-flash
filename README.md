@@ -4,7 +4,7 @@
 🇬🇧 [![English](https://img.shields.io/badge/lang-English-blue.svg)](README.en.md)
 
 Este es el repositorio de infraestructura del taller. Construye la imagen
-RadxaOS reproducible para las ZERO 3W, prepara `equipo0`–`equipo9` y `admin`, y
+RadxaOS reproducible para las ZERO 3W, prepara `equipo0`–`equipo11` y `admin`, y
 contiene el portal de Wi‑Fi, el escritorio Openbox/noVNC y los ayudantes de
 flasheo para macOS y Windows.
 
@@ -20,7 +20,7 @@ Abra **[cdmx-radxaflash.mantilla.ca](https://cdmx-radxaflash.mantilla.ca)**:
 1. Inserte una tarjeta SD de al menos 8 GB.
 2. Elija macOS, Windows o Linux en la web y copie el comando. Péguelo en
    Terminal o en PowerShell como administrador.
-3. Seleccione la unidad extraíble y `equipo0`–`equipo9` o `admin`.
+3. Seleccione la unidad extraíble y `equipo0`–`equipo11` o `admin`.
 4. Confirme el borrado y espere a que la escritura **y la lectura de
    verificación** lleguen a 100%.
 
@@ -104,7 +104,7 @@ si el sistema no lo abre, use:
 
 ```text
 equipoN: http://10.42.N.1:8080/
-admin:   http://10.42.10.1:8080/
+admin:   http://10.42.12.1:8080/
 ```
 
 Después de guardar el Wi‑Fi, vuelva a conectar la laptop o el teléfono a esa
