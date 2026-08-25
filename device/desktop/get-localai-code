@@ -7,3 +7,8 @@ if [[ -d cdmx-local-ai/.git ]]; then
 else
     git clone https://github.com/the-matter-lab/cdmx-local-ai.git cdmx-local-ai
 fi
+
+printf '\nLocal AI code is ready in ~/workspace/cdmx-local-ai.\n'
+printf 'Its skills and tools remain inside that clone. Continue with:\n'
+printf '  cd ~/workspace/cdmx-local-ai\n'
+printf '  picoclaw onboard\n'

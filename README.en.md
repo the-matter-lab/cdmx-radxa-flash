@@ -85,13 +85,16 @@ and asks for one administrator authorization. The existing
   the color lab. The custom overlay disables FIQ/UART2 on those pins.
 - GPIO configuration remains active from boot; Color Lab starts manually with
   `scripts/color-lab.sh`, and `Ctrl-C` stops its site and sampling.
-- An exact `cdmx-local-ai` version pinned in
-  [`image/cdmx-local-ai.env`](image/cdmx-local-ai.env); agent code is not
-  duplicated here.
-- Two visible scripts in `~/workspace`, `get-localai-code` and
-  `get-bayesopt-code`, clone or update only the selected repository. The latter
-  also prepares its Python environment without `sudo`. Exercise repositories
-  are not pre-cloned.
+- PicoClaw and Pi executables installed through a pinned `cdmx-local-ai`
+  installer version in [`image/cdmx-local-ai.env`](image/cdmx-local-ai.env).
+  The repository, its skills, its tools, and `AGENT.md` are not included in the
+  image.
+- Exactly three visible files in a fresh or reset `~/workspace`: `README.md`,
+  `get-localai-code`, and `get-bayesopt-code`. Each helper clones or updates
+  only its selected repository; BayesOpt also prepares its Python environment
+  without `sudo`.
+- Reset asks for confirmation, removes both clones and local agent state, then
+  restores those same three files for the next team.
 - Simple `~/workspace` path, persistent buttons for reopening apps, and
   separate memory ceilings for 1 GB team boards and the 2 GB admin board.
 

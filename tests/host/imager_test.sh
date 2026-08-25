@@ -106,7 +106,7 @@ assert_eq 1 "$(grep -c 'cdmx-network-monitor.service' "$ROOT/device/install.sh")
 assert_eq "fallback_delay=\${CDMX_NETWORK_FALLBACK_DELAY:-60}" \
   "$(grep '^fallback_delay=' "$ROOT/device/network/cdmx-network")" \
   'offline boards restore onboarding after a bounded delay'
-assert_eq 19af652306228790f5b6588d3acbc3a3de0826d5 \
+assert_eq 6538bf5d7255678a9db3df57a76148001650a020 \
   "$(bash -c 'source "$1"; printf %s "$AGENT_REPO_REF"' _ "$ROOT/image/cdmx-local-ai.env")" \
   'image build pins the separate local-agent repository commit'
 if [[ -d $ROOT/device/agent ]]; then
@@ -150,6 +150,8 @@ assert_eq 1 "$(grep -c 'pip install --no-build-isolation --no-deps --editable' "
   'workspace BayesOpt download also prepares its local environment'
 assert_eq 1 "$(grep -c 'https://github.com/the-matter-lab/cdmx-local-ai.git' "$ROOT/device/desktop/get-localai-code")" \
   'workspace Local AI script downloads only Local AI'
+assert_eq 0 "$(grep -Ec 'cp .*skills|cp .*tools|cp .*AGENT' "$ROOT/device/desktop/get-localai-code" || true)" \
+  'Local AI helper does not seed skills, tools, or agent files outside its clone'
 assert_eq 'panel_position = bottom center horizontal' \
   "$(grep '^panel_position = ' "$ROOT/device/desktop/tint2rc")" \
   'desktop panel stays at the bottom'
@@ -167,17 +169,36 @@ assert_eq 'panel_items = EEEEETSECE' \
   "$(grep '^panel_items = ' "$ROOT/device/desktop/tint2rc")" \
   'reset control is placed after the clock at the far right'
 assert_eq 1 "$(grep -c "execp_command = printf ' Reset '" "$ROOT/device/desktop/tint2rc")" \
-  'bottom panel has one BayesOpt reset control'
-assert_eq 1 "$(grep -c 'reset-bayesopt.py' "$ROOT/device/desktop/tint2rc")" \
-  'reset control opens the confirmation application'
+  'bottom panel has one workshop reset control'
+assert_eq 1 "$(grep -c 'reset-workshop.py' "$ROOT/device/desktop/tint2rc")" \
+  'reset control opens the full-workshop confirmation application'
 reset_workspace="$tmp/reset-workspace"
-mkdir -p "$reset_workspace/cdmx-bayesopt"
-touch "$reset_workspace/cdmx-bayesopt/result.txt" "$reset_workspace/get-bayesopt-code"
-CDMX_WORKSPACE="$reset_workspace" python3 "$ROOT/device/desktop/reset-bayesopt.py" --yes
+reset_home="$tmp/reset-home"
+mkdir -p "$reset_workspace/cdmx-bayesopt" "$reset_workspace/cdmx-local-ai" \
+  "$reset_workspace/skills" "$reset_workspace/tools" \
+  "$reset_home/.picoclaw" "$reset_home/.pi"
+touch "$reset_workspace/cdmx-bayesopt/result.txt" \
+  "$reset_workspace/cdmx-local-ai/source.py" \
+  "$reset_workspace/skills/SKILL.md" "$reset_workspace/tools/tool.py" \
+  "$reset_workspace/AGENT.md" "$reset_workspace/notes.txt" \
+  "$reset_home/.picoclaw/config.json" "$reset_home/.pi/history"
+CDMX_WORKSPACE="$reset_workspace" CDMX_HOME="$reset_home" \
+  python3 "$ROOT/device/desktop/reset-workshop.py" --yes
 assert_eq no "$([[ -e $reset_workspace/cdmx-bayesopt ]] && printf yes || printf no)" \
   'reset removes the BayesOpt checkout'
-assert_eq yes "$([[ -f $reset_workspace/get-bayesopt-code ]] && printf yes || printf no)" \
-  'reset preserves the clean-clone helper'
+assert_eq no "$([[ -e $reset_workspace/cdmx-local-ai ]] && printf yes || printf no)" \
+  'reset removes the Local AI checkout'
+assert_eq no "$([[ -e $reset_workspace/skills || -e $reset_workspace/tools || -e $reset_workspace/AGENT.md ]] && printf yes || printf no)" \
+  'reset removes pre-clone skills, tools, and agent files'
+reset_entries=$(find "$reset_workspace" -mindepth 1 -maxdepth 1 -exec basename {} \; | LC_ALL=C sort | paste -sd, -)
+assert_eq 'README.md,get-bayesopt-code,get-localai-code' "$reset_entries" \
+  'reset restores exactly the three pristine workspace files'
+assert_eq yes "$([[ -x $reset_workspace/get-bayesopt-code && -x $reset_workspace/get-localai-code ]] && printf yes || printf no)" \
+  'reset restores both executable clean-clone helpers'
+assert_eq 0 "$(find "$reset_home/.picoclaw" "$reset_home/.pi" -mindepth 1 | wc -l | tr -d ' ')" \
+  'reset clears participant Local AI state'
+assert_eq 1 "$(grep -c 'The workspace will contain only README.md' "$ROOT/device/desktop/reset-workshop.py")" \
+  'reset confirmation states the exact pristine result'
 assert_eq 0 "$(grep -c 'Get code' "$ROOT/device/desktop/tint2rc" || true)" \
   'bottom panel has no Get code launcher'
 assert_eq 'time1_timezone = :America/Mexico_City' \
@@ -189,6 +210,12 @@ assert_eq 1 "$(grep -c 'ln -sfn /var/lib/cdmx-picoclaw/workspace "\$home_workspa
   'participants receive the simple ~/workspace path'
 assert_eq 2 "$(grep -c '/var/lib/cdmx-picoclaw/workspace/get-.*-code' "$ROOT/device/install.sh")" \
   'both download scripts are preinstalled in the visible workspace'
+assert_eq 1 "$(grep -c '/var/lib/cdmx-picoclaw/workspace/README.md' "$ROOT/device/install.sh")" \
+  'workshop README is the third pristine workspace file'
+assert_eq 1 "$(grep -c 'find /opt/cdmx-local-ai -mindepth 1 -delete' "$ROOT/device/install.sh")" \
+  'full image build removes the Local AI source checkout after installing runtimes'
+assert_eq 1 "$(grep -c 'find "\$workshop_workspace" -mindepth 1 -delete' "$ROOT/host/patch-image-in-container.sh")" \
+  'fast image patch restores a pristine workspace'
 old_org=aspuru-guzik'-group'
 if grep -Rqs --exclude-dir=.git --exclude-dir=image "$old_org" "$ROOT"; then
   printf 'not ok - old workshop GitHub organization remains in tracked source\n'

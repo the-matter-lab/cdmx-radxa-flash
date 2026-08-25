@@ -3,8 +3,19 @@ MATTER LAB INTERNATIONAL CONFERENCE 2026 - SATELLITE SCHOOL
 INICIO RAPIDO
 
 La barra inferior tiene APPS, Terminal, Code, Agent y Monitor. AGENTS y BAYES
-son los dos escritorios. El codigo del equipo vive en ~/workspace. Reset, a la
-derecha del reloj, pide confirmacion y borra solo ~/workspace/cdmx-bayesopt.
+son los dos escritorios. El codigo del equipo vive en ~/workspace. Al inicio y
+despues de Reset, este directorio contiene solamente README.md,
+get-bayesopt-code y get-localai-code.
+
+LOCAL AI
+
+  ./get-localai-code
+  cd cdmx-local-ai
+  picoclaw onboard
+
+Las skills y tools llegan dentro del clon cdmx-local-ai; no vienen instaladas
+en la imagen. Reset, a la derecha del reloj, pide confirmacion y borra los dos
+clones, los resultados, los archivos del agente y su configuracion local.
 
 LABORATORIO DE COLOR (manual)
 
@@ -30,8 +41,19 @@ NeoPixel: VCC=2, DIN=19, GND=20.
 QUICK START
 
 The bottom panel has APPS, Terminal, Code, Agent, and Monitor. AGENTS and BAYES
-are the two desktops. Team code lives in ~/workspace. Reset, to the right of
-the clock, asks for confirmation and removes only ~/workspace/cdmx-bayesopt.
+are the two desktops. Team code lives in ~/workspace. Initially and after a
+Reset, this directory contains only README.md, get-bayesopt-code, and
+get-localai-code.
+
+LOCAL AI
+
+  ./get-localai-code
+  cd cdmx-local-ai
+  picoclaw onboard
+
+Skills and tools arrive inside the cdmx-local-ai clone; they are not installed
+in the image. Reset, to the right of the clock, asks for confirmation and
+removes both clones, results, agent files, and local agent configuration.
 
 COLOR LAB (manual)
 

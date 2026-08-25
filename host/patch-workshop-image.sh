@@ -7,21 +7,25 @@ source "$ROOT/host/lib/imager.sh"
 
 base_image=""
 base_sha512=""
+base_version=""
 image_version=""
 while (($#)); do
     case "$1" in
         --base-image) base_image=${2:-}; shift 2 ;;
         --base-sha512) base_sha512=${2:-}; shift 2 ;;
+        --base-version) base_version=${2:-}; shift 2 ;;
         --version) image_version=${2:-}; shift 2 ;;
         -h|--help)
-            printf 'Usage: %s --base-image PATH --base-sha512 SHA512 --version YYYY-MM-DD.N\n' "$0"
+            printf 'Usage: %s --base-image PATH --base-sha512 SHA512 --base-version YYYY-MM-DD.N --version YYYY-MM-DD.N\n' "$0"
             exit 0 ;;
         *) die "Unknown argument: $1" ;;
     esac
 done
 
-[[ -n $base_image && -n $base_sha512 && -n $image_version ]] ||
-    die 'The base image, base SHA-512, and output version are required'
+[[ -n $base_image && -n $base_sha512 && -n $base_version && -n $image_version ]] ||
+    die 'The base image, base SHA-512, base version, and output version are required'
+[[ $base_version =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}\.[0-9]+$ ]] ||
+    die 'Base version must use YYYY-MM-DD.N'
 [[ $image_version =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}\.[0-9]+$ ]] ||
     die 'Version must use YYYY-MM-DD.N'
 
@@ -59,7 +63,7 @@ docker run --rm --privileged \
     -v "$source_archive:/source.tar:ro" \
     ubuntu:24.04 \
     /bin/bash /source/host/patch-image-in-container.sh \
-    "/images/$(basename "$output_raw")" /source.tar "$image_version" "$source_commit"
+    "/images/$(basename "$output_raw")" /source.tar "$image_version" "$source_commit" "$base_version"
 
 note 'Compressing and checking the patched workshop image'
 xz -T0 -1 -c -- "$output_raw" > "$output_partial"
@@ -69,4 +73,3 @@ printf '%s  %s\n' "$checksum" "$(basename "$output_xz")" > "$checksum_partial"
 mv -f -- "$output_partial" "$output_xz"
 mv -f -- "$checksum_partial" "$output_xz.sha512"
 note "Patched workshop image ready: $output_xz"
-

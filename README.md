@@ -84,13 +84,16 @@ comandos existente con `host/flash-team.sh`.
   laboratorio de color. El overlay propio desactiva FIQ/UART2 en esos pines.
 - La configuración GPIO permanece activa desde el arranque; Color Lab se abre
   manualmente con `scripts/color-lab.sh` y `Ctrl-C` detiene sitio y muestreo.
-- Una versión exacta de `cdmx-local-ai`, fijada en
-  [`image/cdmx-local-ai.env`](image/cdmx-local-ai.env); el código del agente no
-  se duplica aquí.
-- Dos scripts visibles en `~/workspace`, `get-localai-code` y
-  `get-bayesopt-code`, que clonan o actualizan solamente el repositorio elegido.
-  El segundo también prepara su entorno Python sin pedir `sudo`.
-  Los repositorios de ejercicios no se clonan de antemano.
+- Los ejecutables PicoClaw y Pi se instalan mediante una versión fijada del
+  instalador de `cdmx-local-ai` en
+  [`image/cdmx-local-ai.env`](image/cdmx-local-ai.env). El repositorio, sus
+  skills, sus tools y `AGENT.md` no se incluyen en la imagen.
+- Exactamente tres archivos visibles en un `~/workspace` nuevo o reiniciado:
+  `README.md`, `get-localai-code` y `get-bayesopt-code`. Los dos scripts clonan
+  o actualizan solamente el repositorio elegido; BayesOpt también prepara su
+  entorno Python sin pedir `sudo`.
+- Reset pide confirmación, elimina ambos clones y la configuración local del
+  agente, y restaura esos mismos tres archivos para el siguiente equipo.
 - Ruta sencilla `~/workspace`, botones para reabrir aplicaciones y límites de
   memoria distintos para los equipos de 1 GB y la placa admin de 2 GB.
 

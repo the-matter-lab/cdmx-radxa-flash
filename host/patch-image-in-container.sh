@@ -5,6 +5,7 @@ image=${1:?image path required}
 source_input=${2:?tracked source archive required}
 image_version=${3:?image version required}
 source_commit=${4:?source commit required}
+base_image_version=${5:?base image version required}
 mount_root=/mnt/cdmx-patch
 rootfs=$mount_root/rootfs
 source_root=/mnt/cdmx-source
@@ -23,6 +24,10 @@ trap cleanup EXIT
 
 [[ $image_version =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}\.[0-9]+$ ]] || {
     printf 'Invalid image version: %s\n' "$image_version" >&2
+    exit 64
+}
+[[ $base_image_version =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}\.[0-9]+$ ]] || {
+    printf 'Invalid base image version: %s\n' "$base_image_version" >&2
     exit 64
 }
 [[ $source_commit =~ ^[0-9a-f]{40}$ ]] || {
@@ -98,9 +103,72 @@ for unit in "$source_root"/device/systemd/*.service "$source_root"/device/system
     install -m 0644 "$unit" "$rootfs/etc/systemd/system/$(basename "$unit")"
 done
 
+# Keep only the runtime executables installed in the proven base. The Local AI
+# repository, its skills/tools, legacy service configuration, and participant
+# state must be created on demand rather than baked into a freshly flashed SD.
+if [[ -L $rootfs/opt/cdmx-local-ai ]]; then
+    unlink "$rootfs/opt/cdmx-local-ai"
+elif [[ -d $rootfs/opt/cdmx-local-ai ]]; then
+    find "$rootfs/opt/cdmx-local-ai" -mindepth 1 -delete
+    rmdir "$rootfs/opt/cdmx-local-ai"
+elif [[ -e $rootfs/opt/cdmx-local-ai ]]; then
+    rm -f -- "$rootfs/opt/cdmx-local-ai"
+fi
+rm -f -- \
+    "$rootfs/usr/local/sbin/cdmx-agent-setup" \
+    "$rootfs/etc/systemd/system/cdmx-picoclaw.service" \
+    "$rootfs/etc/systemd/system/multi-user.target.wants/cdmx-picoclaw.service"
+if [[ -d $rootfs/etc/systemd/system/cdmx-picoclaw.service.d ]]; then
+    find "$rootfs/etc/systemd/system/cdmx-picoclaw.service.d" -mindepth 1 -delete
+    rmdir "$rootfs/etc/systemd/system/cdmx-picoclaw.service.d"
+fi
+if [[ -d $rootfs/etc/cdmx-picoclaw ]]; then
+    find "$rootfs/etc/cdmx-picoclaw" -mindepth 1 -delete
+fi
+
+workshop_workspace=$rootfs/var/lib/cdmx-picoclaw/workspace
+[[ -d $workshop_workspace && ! -L $workshop_workspace ]] || {
+    printf 'The base image is missing the participant workspace.\n' >&2
+    exit 65
+}
+workshop_uid=$(awk -F: '$1 == "cdmx" { print $3 }' "$rootfs/etc/passwd")
+workspace_gid=$(awk -F: '$1 == "cdmx-workspace" { print $3 }' "$rootfs/etc/group")
+[[ $workshop_uid =~ ^[0-9]+$ && $workspace_gid =~ ^[0-9]+$ ]] || {
+    printf 'Could not resolve the workshop workspace ownership.\n' >&2
+    exit 65
+}
+
+find "$workshop_workspace" -mindepth 1 -delete
+install -m 0644 -o "$workshop_uid" -g "$workspace_gid" \
+    "$source_root/device/desktop/WORKSHOP-README.txt" \
+    "$workshop_workspace/README.md"
+install -m 0755 -o "$workshop_uid" -g "$workspace_gid" \
+    "$source_root/device/desktop/get-bayesopt-code" \
+    "$workshop_workspace/get-bayesopt-code"
+install -m 0755 -o "$workshop_uid" -g "$workspace_gid" \
+    "$source_root/device/desktop/get-localai-code" \
+    "$workshop_workspace/get-localai-code"
+
+for state_dir in "$rootfs/home/cdmx/.picoclaw" "$rootfs/home/cdmx/.pi"; do
+    if [[ -d $state_dir && ! -L $state_dir ]]; then
+        find "$state_dir" -mindepth 1 -delete
+    fi
+done
+agent_state=$rootfs/var/lib/cdmx-picoclaw
+if [[ -d $agent_state ]]; then
+    while IFS= read -r -d '' state_entry; do
+        if [[ -d $state_entry && ! -L $state_entry ]]; then
+            find "$state_entry" -mindepth 1 -delete
+            rmdir "$state_entry"
+        else
+            rm -f -- "$state_entry"
+        fi
+    done < <(find "$agent_state" -mindepth 1 -maxdepth 1 ! -name workspace -print0)
+fi
+
 cat > "$rootfs/etc/cdmx/image-release" <<EOF
 IMAGE_VERSION=$image_version
-BASE_IMAGE_VERSION=2026-08-13.2
+BASE_IMAGE_VERSION=$base_image_version
 SOURCE_COMMIT=$source_commit
 IDENTITY_RANGE=0-98
 ADMIN_NETWORK_INDEX=99

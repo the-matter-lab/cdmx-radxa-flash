@@ -283,12 +283,6 @@ chmod 0755 /opt/cdmx-radxa-flash/device/network/cdmx-network \
 
 rm -f /usr/local/bin/cdmx-get-workshop-repos /usr/local/bin/cdmx-get-bayesopt \
     /usr/local/bin/cdmx-get-local-ai
-install -m 0755 -o "$workshop_user" -g cdmx-workspace \
-    /opt/cdmx-radxa-flash/device/desktop/get-bayesopt-code \
-    /var/lib/cdmx-picoclaw/workspace/get-bayesopt-code
-install -m 0755 -o "$workshop_user" -g cdmx-workspace \
-    /opt/cdmx-radxa-flash/device/desktop/get-localai-code \
-    /var/lib/cdmx-picoclaw/workspace/get-localai-code
 install -m 0644 -o "$workshop_user" -g "$workshop_user" \
     /opt/cdmx-radxa-flash/device/desktop/WORKSHOP-README.txt \
     "/home/$workshop_user/WORKSHOP-README.txt"
@@ -386,6 +380,37 @@ if $install_agents; then
     rm -f -- "$agent_archive"
     trap - EXIT
 fi
+
+# The image carries the PicoClaw and Pi executables, but never a checkout of
+# cdmx-local-ai. Participants obtain the current skills and tools only through
+# get-localai-code. The upstream installer may seed agent files while it
+# installs the binaries, so an offline image build restores the exact pristine
+# three-file workspace after that installer returns.
+if [[ -d /opt/cdmx-local-ai && ! -L /opt/cdmx-local-ai ]]; then
+    find /opt/cdmx-local-ai -mindepth 1 -delete
+    rmdir /opt/cdmx-local-ai
+fi
+if $offline_image; then
+    find /var/lib/cdmx-picoclaw/workspace -mindepth 1 -delete
+    for state_dir in "/home/$workshop_user/.picoclaw" "/home/$workshop_user/.pi"; do
+        find "$state_dir" -mindepth 1 -delete
+    done
+    rm -f /usr/local/sbin/cdmx-agent-setup \
+        /etc/systemd/system/cdmx-picoclaw.service \
+        /etc/systemd/system/multi-user.target.wants/cdmx-picoclaw.service
+    if [[ -d /etc/cdmx-picoclaw ]]; then
+        find /etc/cdmx-picoclaw -mindepth 1 -delete
+    fi
+fi
+install -m 0644 -o "$workshop_user" -g cdmx-workspace \
+    /opt/cdmx-radxa-flash/device/desktop/WORKSHOP-README.txt \
+    /var/lib/cdmx-picoclaw/workspace/README.md
+install -m 0755 -o "$workshop_user" -g cdmx-workspace \
+    /opt/cdmx-radxa-flash/device/desktop/get-bayesopt-code \
+    /var/lib/cdmx-picoclaw/workspace/get-bayesopt-code
+install -m 0755 -o "$workshop_user" -g cdmx-workspace \
+    /opt/cdmx-radxa-flash/device/desktop/get-localai-code \
+    /var/lib/cdmx-picoclaw/workspace/get-localai-code
 
 if $enable_usb_ncm; then
     systemctl enable 'radxa-ncm@*.*.service' 2>/dev/null ||
