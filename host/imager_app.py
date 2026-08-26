@@ -43,6 +43,7 @@ MAX_TEAM_ID = 98
 WINDOWS_SAFE_BUS_TYPES = {"USB", "SD", "MMC"}
 CHUNK_SIZE = 4 * 1024 * 1024
 RUNTIME: dict[str, object] = {}
+RUNTIME_LOCK = threading.Lock()
 DISK_CACHE: tuple[float, list[dict[str, object]]] = (0.0, [])
 DISK_CACHE_LOCK = threading.Lock()
 
@@ -354,7 +355,14 @@ def load_manifest(source: str) -> dict[str, object]:
     if parsed.scheme in {"https", "http"}:
         if parsed.scheme != "https" and parsed.hostname not in {"127.0.0.1", "localhost"}:
             raise ValueError("remote manifest must use HTTPS")
-        request = urllib.request.Request(source, headers={"User-Agent": "CDMX-Radxa-Flasher/2"})
+        request = urllib.request.Request(
+            source,
+            headers={
+                "User-Agent": "CDMX-Radxa-Flasher/3",
+                "Cache-Control": "no-cache",
+                "Pragma": "no-cache",
+            },
+        )
         with urllib.request.urlopen(request, timeout=15) as response:
             data = response.read(1_000_001)
             if len(data) > 1_000_000:
@@ -362,6 +370,21 @@ def load_manifest(source: str) -> dict[str, object]:
     else:
         data = Path(source).read_bytes()
     return validate_manifest(json.loads(data))
+
+
+def refresh_runtime_manifest() -> dict[str, object]:
+    """Reload the release metadata immediately before an SD-card write."""
+    with RUNTIME_LOCK:
+        source = RUNTIME.get("manifest_source")
+    if not isinstance(source, str) or not source:
+        raise ValueError("no image manifest source is configured")
+    try:
+        manifest = load_manifest(source)
+    except Exception as exc:
+        raise OSError(f"could not refresh image metadata: {exc}") from exc
+    with RUNTIME_LOCK:
+        RUNTIME["manifest"] = manifest
+    return manifest
 
 
 def cache_directory() -> Path:
@@ -417,7 +440,8 @@ class JobState:
         with self.lock:
             snapshot = dict(self.data)
             snapshot["logs"] = list(self.data.get("logs", []))
-        manifest = RUNTIME.get("manifest")
+        with RUNTIME_LOCK:
+            manifest = RUNTIME.get("manifest")
         image: dict[str, object] = manifest.get("image", {}) if isinstance(manifest, dict) else {}
         cached_path = cached_image_path(image) if image else None
         snapshot["disks"] = list_safe_disks()
@@ -428,8 +452,10 @@ class JobState:
                 "name": image.get("filename", ""),
                 "size": image.get("compressed_bytes", 0),
                 "version": manifest.get("version", "") if isinstance(manifest, dict) else "",
+                "sha512": image.get("sha512", ""),
             }
         }
+        snapshot["api"] = 3
         return snapshot
 
 
@@ -545,12 +571,13 @@ def download_image(image: dict[str, object], destination: Path) -> None:
 
 
 def prepare_image() -> tuple[Path, dict[str, object]]:
-    manifest = RUNTIME.get("manifest")
+    with RUNTIME_LOCK:
+        manifest = RUNTIME.get("manifest")
+        override = RUNTIME.get("image_override")
     if not isinstance(manifest, dict) or not isinstance(manifest.get("image"), dict):
         raise ValueError("no valid workshop image manifest is loaded")
     image = dict(manifest["image"])
     expected = str(image["sha512"])
-    override = RUNTIME.get("image_override")
     if isinstance(override, Path):
         path = override
     elif LOCAL_GOLDEN_IMAGE.is_file() and sidecar_digest(LOCAL_GOLDEN_IMAGE) == expected:
@@ -766,6 +793,9 @@ def flash_job(disk: str, team: int | str) -> None:
             )
             if not is_administrator():
                 raise PermissionError("start the imager with administrator privileges")
+            STATE.update(phase="manifest", label="Checking latest image")
+            manifest = refresh_runtime_manifest()
+            STATE.log(f"Using image version {manifest.get('version', 'latest')}")
             image_path, image = prepare_image()
             total = int(image["uncompressed_bytes"])
             ensure_disk(disk, total)
@@ -809,7 +839,7 @@ def flash_job(disk: str, team: int | str) -> None:
 
 
 class ImagerHandler(BaseHTTPRequestHandler):
-    server_version = "CDMXImager/2.1"
+    server_version = "CDMXImager/3.0"
 
     def log_message(self, fmt: str, *args: object) -> None:
         return
@@ -874,7 +904,7 @@ class ImagerHandler(BaseHTTPRequestHandler):
             if not self.trusted_web_origin():
                 self.json_response(HTTPStatus.FORBIDDEN, {"error": "origin not allowed"})
                 return
-            self.json_response(HTTPStatus.OK, {"token": self.token, "api": 2})
+            self.json_response(HTTPStatus.OK, {"token": self.token, "api": 3})
         elif self.path == "/api/state":
             self.json_response(HTTPStatus.OK, STATE.snapshot())
         else:
@@ -935,9 +965,13 @@ def initialize_runtime(manifest_source: str, image_override: str | None) -> None
             raise remote_error
         manifest = load_manifest(str(LOCAL_MANIFEST))
         print(f"Remote manifest unavailable ({remote_error}); using bundled metadata.", flush=True)
-    RUNTIME["manifest"] = manifest
-    if image_override:
-        RUNTIME["image_override"] = Path(image_override).expanduser().resolve()
+    with RUNTIME_LOCK:
+        RUNTIME["manifest_source"] = manifest_source
+        RUNTIME["manifest"] = manifest
+        if image_override:
+            RUNTIME["image_override"] = Path(image_override).expanduser().resolve()
+        else:
+            RUNTIME.pop("image_override", None)
 
 
 def main() -> int:

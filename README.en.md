@@ -34,7 +34,9 @@ helper listens only on `127.0.0.1`, shows only removable cards from built-in SD
 slots, USB-A/USB-C adapters, and native SD/MMC buses, rechecks the target before
 erasing, and downloads the version declared in
 [`site/manifest.json`](site/manifest.json). It caches the image and SHA-512 for
-subsequent cards.
+subsequent cards. Before erasing each card, the helper reloads the uncached
+manifest; the website blocks an older helper instead of letting it write an
+obsolete image.
 
 There is only one user interface: the public website. `127.0.0.1:8766` is the
 private local bridge, and its root redirects to the public site instead of

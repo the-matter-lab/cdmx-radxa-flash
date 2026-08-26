@@ -34,7 +34,10 @@ ayudante privilegiado escucha solo en `127.0.0.1`, muestra únicamente unidades
 extraíbles de lectores SD integrados, adaptadores USB-A/USB-C y buses SD/MMC,
 vuelve a comprobar el destino antes de borrarlo y descarga la
 versión indicada en [`site/manifest.json`](site/manifest.json). La imagen y su
-SHA‑512 se guardan en caché para las tarjetas siguientes.
+SHA‑512 se guardan en caché para las tarjetas siguientes. Antes de borrar cada
+tarjeta, el ayudante vuelve a consultar el manifiesto sin caché; una versión
+anterior del ayudante queda bloqueada por la web en vez de grabar una imagen
+obsoleta.
 
 Solo existe una interfaz de usuario: la web pública. `127.0.0.1:8766` es el
 puente local privado y su raíz redirige a la web pública; no presenta una

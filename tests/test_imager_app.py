@@ -207,6 +207,37 @@ class ImagerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             imager.validate_manifest(manifest)
 
+    def test_runtime_manifest_refresh_replaces_stale_release(self):
+        old_manifest = {"schema": 1, "version": "old", "image": {}}
+        new_manifest = {"schema": 1, "version": "new", "image": {}}
+        previous_runtime = dict(imager.RUNTIME)
+        try:
+            imager.RUNTIME.clear()
+            imager.RUNTIME.update(
+                manifest_source="https://example.test/manifest.json",
+                manifest=old_manifest,
+            )
+            with mock.patch.object(imager, "load_manifest", return_value=new_manifest) as load:
+                refreshed = imager.refresh_runtime_manifest()
+            load.assert_called_once_with("https://example.test/manifest.json")
+            self.assertIs(refreshed, new_manifest)
+            self.assertIs(imager.RUNTIME["manifest"], new_manifest)
+        finally:
+            imager.RUNTIME.clear()
+            imager.RUNTIME.update(previous_runtime)
+
+    def test_flash_refreshes_release_before_preparing_image(self):
+        refreshed = {"schema": 1, "version": "current", "image": {}}
+        with (
+            mock.patch.object(imager, "is_administrator", return_value=True),
+            mock.patch.object(imager, "refresh_runtime_manifest", return_value=refreshed) as refresh,
+            mock.patch.object(imager, "prepare_image", side_effect=RuntimeError("stop after refresh")) as prepare,
+        ):
+            imager.flash_job("/dev/disk10", "admin")
+        refresh.assert_called_once_with()
+        prepare.assert_called_once_with()
+        self.assertIn("Using image version current", imager.STATE.snapshot()["logs"])
+
     def test_stale_legacy_cache_is_removed_and_redownloaded(self):
         payload = b"current image"
         digest = hashlib.sha512(payload).hexdigest()
@@ -295,6 +326,9 @@ class ImagerTests(unittest.TestCase):
         self.assertIn("TEAM_COUNT=12", public_html)
         self.assertIn("IDENTITIES=[...Array(TEAM_COUNT).keys(),'admin']", public_html)
         self.assertIn("Reintentar", public_html)
+        self.assertIn("manifestMismatch", public_html)
+        self.assertIn("El lector conserva la imagen", public_html)
+        self.assertIn("helperApi<3", public_html)
         self.assertIn("Copiar comando", public_html)
         self.assertIn("lector SD integrado", public_html)
         self.assertIn('data-platform="windows"', public_html)
@@ -371,7 +405,9 @@ class ImagerTests(unittest.TestCase):
             self.assertEqual(response.status, 200)
             self.assertEqual(response.getheader("Access-Control-Allow-Origin"), imager.TRUSTED_WEB_ORIGIN)
             self.assertEqual(response.getheader("Access-Control-Allow-Private-Network"), "true")
-            self.assertEqual(__import__("json").loads(response.read())["token"], "test-token")
+            session = __import__("json").loads(response.read())
+            self.assertEqual(session["token"], "test-token")
+            self.assertEqual(session["api"], 3)
             connection.close()
 
             connection = http.client.HTTPConnection("127.0.0.1", port, timeout=3)
