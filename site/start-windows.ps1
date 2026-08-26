@@ -1,8 +1,8 @@
 #requires -Version 5.1
 $ErrorActionPreference = "Stop"
 
-$SourceCommit = "0380f57a9550c8e3e7895425096aa934a507c901"
-$ArchiveSha256 = "b9778ffee98013789204e3793abbd9b3695a1626f364815d3623cf88d5e877b2"
+$SourceCommit = "4fb7fd1424db94759ebb0d4c1fd76f5eadda32f4"
+$ArchiveSha256 = "498a4c58b0d1461f091940e69ce67ec9bf67b4707f1381e708fff02b9861364c"
 $ArchiveUrl = "https://codeload.github.com/the-matter-lab/cdmx-radxa-flash/tar.gz/$SourceCommit"
 $PublicSite = "https://cdmx-radxaflash.mantilla.ca/"
 $AppDir = Join-Path $env:LOCALAPPDATA "CDMXRadxaFlash"

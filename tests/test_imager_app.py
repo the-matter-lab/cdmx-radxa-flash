@@ -343,18 +343,18 @@ class ImagerTests(unittest.TestCase):
         self.assertIn(imager.PUBLIC_SITE_URL, (MODULE_PATH.parents[1] / "host" / "start-imager.command").read_text())
 
         mac_launcher = (MODULE_PATH.parents[1] / "site" / "start-macos.sh").read_text(encoding="utf-8")
-        self.assertIn("SOURCE_COMMIT=0380f57a9550c8e3e7895425096aa934a507c901", mac_launcher)
-        self.assertIn("ARCHIVE_SHA256=b9778ffee98013789204e3793abbd9b3695a1626f364815d3623cf88d5e877b2", mac_launcher)
+        self.assertIn("SOURCE_COMMIT=4fb7fd1424db94759ebb0d4c1fd76f5eadda32f4", mac_launcher)
+        self.assertIn("ARCHIVE_SHA256=498a4c58b0d1461f091940e69ce67ec9bf67b4707f1381e708fff02b9861364c", mac_launcher)
         self.assertIn("codeload.github.com/the-matter-lab/cdmx-radxa-flash", mac_launcher)
         self.assertIn("shasum -a 256", mac_launcher)
 
         linux_launcher = (MODULE_PATH.parents[1] / "site" / "start-linux.sh").read_text(encoding="utf-8")
-        self.assertIn("SOURCE_COMMIT=0380f57a9550c8e3e7895425096aa934a507c901", linux_launcher)
+        self.assertIn("SOURCE_COMMIT=4fb7fd1424db94759ebb0d4c1fd76f5eadda32f4", linux_launcher)
         self.assertIn("sha256sum", linux_launcher)
         self.assertIn("exec sudo", linux_launcher)
 
         windows_launcher = (MODULE_PATH.parents[1] / "site" / "start-windows.ps1").read_text(encoding="utf-8")
-        self.assertIn('$SourceCommit = "0380f57a9550c8e3e7895425096aa934a507c901"', windows_launcher)
+        self.assertIn('$SourceCommit = "4fb7fd1424db94759ebb0d4c1fd76f5eadda32f4"', windows_launcher)
         self.assertIn("Get-FileHash -Algorithm SHA256", windows_launcher)
         self.assertIn("WindowsBuiltInRole]::Administrator", windows_launcher)
 
