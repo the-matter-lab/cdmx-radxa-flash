@@ -287,6 +287,18 @@ install -m 0644 -o "$workshop_user" -g "$workshop_user" \
     /opt/cdmx-radxa-flash/device/desktop/WORKSHOP-README.txt \
     "/home/$workshop_user/WORKSHOP-README.txt"
 
+# Seed Geany for deterministic Python editing: four spaces, never hard tabs,
+# and no content-based indentation detection that can override the policy.
+geany_config_dir="/home/$workshop_user/.config/geany"
+install -d -m 0755 -o "$workshop_user" -g "$workshop_user" \
+    "$geany_config_dir" "$geany_config_dir/filedefs"
+install -m 0644 -o "$workshop_user" -g "$workshop_user" \
+    /opt/cdmx-radxa-flash/device/desktop/geany.conf \
+    "$geany_config_dir/geany.conf"
+install -m 0644 -o "$workshop_user" -g "$workshop_user" \
+    /opt/cdmx-radxa-flash/device/desktop/filetypes.python \
+    "$geany_config_dir/filedefs/filetypes.python"
+
 install -m 0755 /opt/cdmx-radxa-flash/device/network/cdmx-network /usr/local/sbin/cdmx-network
 install -m 0755 /opt/cdmx-radxa-flash/device/network/network_portal.py /usr/local/lib/cdmx/network_portal.py
 install -d -m 0755 /usr/local/share/cdmx

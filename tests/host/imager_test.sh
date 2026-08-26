@@ -142,6 +142,28 @@ assert_eq 1 "$(grep -c '<keybind key="C-A-t">' "$ROOT/device/desktop/openbox.xml
   'desktop has a new-terminal shortcut'
 assert_eq 1 "$(grep -c '<item label="Code editor">' "$ROOT/device/desktop/menu.xml")" \
   'desktop menu includes a graphical code editor'
+geany_config="$ROOT/device/desktop/geany.conf"
+python_filetype="$ROOT/device/desktop/filetypes.python"
+assert_eq 4 "$(sed -n 's/^pref_editor_tab_width=//p' "$geany_config")" \
+  'Geany defaults to a four-column indentation width'
+assert_eq 0 "$(sed -n 's/^indent_type=//p' "$geany_config")" \
+  'Geany globally inserts spaces instead of tabs'
+assert_eq false "$(sed -n 's/^check_detect_indent=//p' "$geany_config")" \
+  'Geany cannot auto-detect a different indentation type'
+assert_eq false "$(sed -n 's/^detect_indent_width=//p' "$geany_config")" \
+  'Geany cannot auto-detect a different indentation width'
+assert_eq true "$(sed -n 's/^use_tab_to_indent=//p' "$geany_config")" \
+  'the Tab key applies the spaces-based indentation policy'
+assert_eq true "$(sed -n 's/^pref_editor_replace_tabs=//p' "$geany_config")" \
+  'Geany replaces pasted hard tabs when saving'
+assert_eq 4 "$(sed -n 's/^width=//p' "$python_filetype")" \
+  'the Python filetype explicitly uses four columns'
+assert_eq 0 "$(sed -n 's/^type=//p' "$python_filetype")" \
+  'the Python filetype explicitly uses spaces'
+assert_eq 2 "$(grep -Ec 'device/desktop/(geany\.conf|filetypes\.python)' "$ROOT/device/install.sh")" \
+  'full image builds seed both Geany user configuration files'
+assert_eq 2 "$(grep -Ec 'device/desktop/(geany\.conf|filetypes\.python)' "$ROOT/host/patch-image-in-container.sh")" \
+  'fast image patches seed both Geany user configuration files'
 assert_eq 0 "$(grep -c 'Get workshop code\|Get code' "$ROOT/device/desktop/menu.xml" || true)" \
   'desktop menu has no code-download button'
 assert_eq 1 "$(grep -c 'https://github.com/the-matter-lab/cdmx-bayesopt.git' "$ROOT/device/desktop/get-bayesopt-code")" \

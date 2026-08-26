@@ -77,7 +77,8 @@ and asks for one administrator authorization. The existing
 - Pinned RadxaOS Debian 12 Bookworm arm64 for ZERO 3, release `rsdk-b1`.
 - Lightweight 1280×720 Openbox desktop with a persistent bottom panel, Mexico
   City clock, two `AGENTS`/`BAYES` workspaces, terminal, Geany, monitor, and
-  Matter Lab wallpaper.
+  Matter Lab wallpaper. Geany pins Python to four spaces, replaces tabs when
+  saving, and disables indentation detection that could override that policy.
 - Shared noVNC desktop: control through `control.html`, observation through
   `view.html`. The Clipboard panel accepts up to 1 MiB from the laptop and
   synchronizes the X11 CLIPBOARD/PRIMARY selections; paste with `Ctrl+V` in

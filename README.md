@@ -78,7 +78,8 @@ comandos existente con `host/flash-team.sh`.
 - RadxaOS Debian 12 Bookworm arm64 para ZERO 3, versión fijada `rsdk-b1`.
 - Escritorio Openbox ligero de 1280×720 con panel inferior persistente, reloj
   de Ciudad de México, dos espacios `AGENTS`/`BAYES`, terminal, Geany, monitor
-  y fondo de Matter Lab.
+  y fondo de Matter Lab. Geany fija Python en cuatro espacios, convierte tabs
+  al guardar y desactiva la autodetección que podría cambiar esa sangría.
 - noVNC compartido: control en `control.html` y observación en `view.html`.
   El panel Clipboard acepta hasta 1 MiB desde la laptop y sincroniza las
   selecciones X11 CLIPBOARD/PRIMARY; pegue con `Ctrl+V` en Geany o

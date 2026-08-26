@@ -1,0 +1,5 @@
+[indentation]
+# GeanyIndentType 0 is spaces. This user override wins for every Python file
+# when indentation auto-detection is disabled in geany.conf.
+width=4
+type=0

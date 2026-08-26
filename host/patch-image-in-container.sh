@@ -132,11 +132,22 @@ workshop_workspace=$rootfs/var/lib/cdmx-picoclaw/workspace
     exit 65
 }
 workshop_uid=$(awk -F: '$1 == "cdmx" { print $3 }' "$rootfs/etc/passwd")
+workshop_gid=$(awk -F: '$1 == "cdmx" { print $4 }' "$rootfs/etc/passwd")
 workspace_gid=$(awk -F: '$1 == "cdmx-workspace" { print $3 }' "$rootfs/etc/group")
-[[ $workshop_uid =~ ^[0-9]+$ && $workspace_gid =~ ^[0-9]+$ ]] || {
+[[ $workshop_uid =~ ^[0-9]+$ && $workshop_gid =~ ^[0-9]+$ && $workspace_gid =~ ^[0-9]+$ ]] || {
     printf 'Could not resolve the workshop workspace ownership.\n' >&2
     exit 65
 }
+
+geany_config_dir=$rootfs/home/cdmx/.config/geany
+install -d -m 0755 -o "$workshop_uid" -g "$workshop_gid" \
+    "$geany_config_dir" "$geany_config_dir/filedefs"
+install -m 0644 -o "$workshop_uid" -g "$workshop_gid" \
+    "$source_root/device/desktop/geany.conf" \
+    "$geany_config_dir/geany.conf"
+install -m 0644 -o "$workshop_uid" -g "$workshop_gid" \
+    "$source_root/device/desktop/filetypes.python" \
+    "$geany_config_dir/filedefs/filetypes.python"
 
 find "$workshop_workspace" -mindepth 1 -delete
 install -m 0644 -o "$workshop_uid" -g "$workspace_gid" \
